@@ -23,7 +23,7 @@
       <form @submit.prevent="handleLogin">
         <div class="input-group">
           <label for="username">Character Name</label>
-          <input type="text" id="username" v-model="username" required />
+          <input type="text" id="username" v-model="username" :class="{ 'error': !username.trim() && submitted }" required />
         </div>
         <!-- Select personalizado para 'reign' -->
         <div class="input-group reign-select">
@@ -39,6 +39,7 @@
             @keydown.down.prevent="handleArrowDown"
             @keydown.up.prevent="handleArrowUp"
             @keydown.enter.prevent="handleEnter"
+            :class="{ 'error': !reign.trim() && submitted }"
             placeholder="Type to search..."
           />
           <ul v-if="showDropdown && filteredReigns.length" class="dropdown-list">
@@ -193,12 +194,15 @@ export default {
       }
     },
     handleEnter() {
-      // Se houver um item destacado, seleciona-o
       if (this.highlightedIndex >= 0 && this.highlightedIndex < this.filteredReigns.length) {
         this.selectReign(this.filteredReigns[this.highlightedIndex]);
       }
     },
     async handleLogin() {
+      if (!this.username.trim() || !this.reign.trim()) {
+        alert("Please fill in both Character Name and Reign fields.");
+      }
+
       try {
         const token = "EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz";
         const response = await axios.get(
@@ -411,6 +415,11 @@ html, body {
 
 .dropdown-list li:hover {
   background-color: rgba(255, 215, 0, 0.2);
+}
+
+.error {
+  border-color: red !important;
+  box-shadow: 0 0 10px red !important;
 }
 
 /* Responsividade */

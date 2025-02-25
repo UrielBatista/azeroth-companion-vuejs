@@ -12,7 +12,8 @@ const routes = [
     path: '/profile',
     name: 'CharacterProfile',
     component: Profile,
-  }
+    meta: { requiresParams: true },
+  },
 ]
 
 const router = createRouter({
@@ -21,15 +22,15 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    if (localStorage.getItem('authenticated') !== 'true') {
-      next({ name: 'Login' })
-    } else {
-      next()
+  if (to.meta.requiresParams) {
+    const query = to.query;
+    if (!query.name || !query.realm) {
+      alert("You must search for a character before accessing the profile.");
+      next('/');
+      return;
     }
-  } else {
-    next()
   }
-})
+  next();
+});
 
 export default router

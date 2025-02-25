@@ -11,7 +11,7 @@
 
     <div class="profile-container">
       <h1>{{ name }}</h1>
-      <h2>Reino: {{ realm }}</h2>
+      <h2>Reign: {{ realm }}</h2>
 
       <div class="image-container">
         <div v-if="!imageLoaded" class="loading-spinner"></div>
@@ -38,6 +38,31 @@
           </ul>
         </div>
       </div>
+
+      <!-- Container de Pvp -->
+      <div class="stats-container">
+        <div v-if="!stats" class="loading-spinner"></div>
+        <div v-else>
+          <h3>Pvp (WIP)</h3>
+          <ul class="stats-grid">
+            <li>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Container de IA -->
+      <div class="stats-container">
+        <div v-if="!stats" class="loading-spinner"></div>
+        <div v-else>
+          <h3>Improvement your gameplay with IA (WIP)</h3>
+          <ul class="stats-grid">
+            <li>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       <!-- Armor Modal Component -->
       <armor-modal 
         v-if="showArmorModal" 
@@ -63,8 +88,8 @@ export default {
   },
   data() {
     return {
-      name: this.$route.query.name || 'Desconhecido',
-      realm: this.$route.query.realm || 'Desconhecido',
+      name: this.$route.query.name || 'Unknow',
+      realm: this.$route.query.realm || 'Unknow',
       image: this.$route.query.image || '',
       imageArmor: require('@/assets/character.png'),
       stats: null,
@@ -178,7 +203,7 @@ export default {
   max-width: 1100px;
   width: 90%;
   min-height: 80vh;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.419);
   backdrop-filter: blur(8px) saturate(180%);
   -webkit-backdrop-filter: blur(8px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.2);
