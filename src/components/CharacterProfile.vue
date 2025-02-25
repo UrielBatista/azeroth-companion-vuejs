@@ -18,7 +18,8 @@
         <img 
           :src="image" 
           alt="Personagem" 
-          class="character-image" 
+          class="character-image"
+          @click="openArmorModal"
           @load="imageLoaded = true"
         />
       </div>
@@ -37,6 +38,14 @@
           </ul>
         </div>
       </div>
+      <!-- Armor Modal Component -->
+      <armor-modal 
+        v-if="showArmorModal" 
+        :character-image="imageArmor"
+        :name="name"
+        :realm="realm"
+        @close="showArmorModal = false" 
+      />
 
       <button @click="goBack" class="btn-back">Voltar</button>
     </div>
@@ -45,16 +54,22 @@
 
 <script>
 import axios from 'axios';
+import ArmorModal from './ModalViewer.vue';
 
 export default {
   name: 'CharacterProfile',
+  components: {
+    ArmorModal,
+  },
   data() {
     return {
       name: this.$route.query.name || 'Desconhecido',
       realm: this.$route.query.realm || 'Desconhecido',
       image: this.$route.query.image || '',
+      imageArmor: require('@/assets/character.png'),
       stats: null,
       imageLoaded: false,
+      showArmorModal: false, // Control modal visibility
       statIcons: {
         health: require('@/assets/icons/health.svg'),
         power: require('@/assets/icons/energy.svg'),
@@ -106,11 +121,15 @@ export default {
         console.error("Erro ao buscar estatísticas:", error);
       }
     },
+    openArmorModal() {
+      this.showArmorModal = true;
+    },
   },
 };
 </script>
 
 <style scoped>
+/* Keep all existing styles from the original CharacterProfile.vue */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
 /* ================================
@@ -192,7 +211,7 @@ h2 {
    CONTAINER DA IMAGEM 
    ================================ */
 .image-container {
-  width: 600px;
+  width: 850px;
   height: 600px;
   max-width: 90vw;
   max-height: 60vh;
@@ -203,7 +222,11 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.06);
+  background-image: url('@/assets/background-character.webp');
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+  position: relative;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow: 0 0 30px rgba(189, 166, 91, 0.2);
@@ -359,9 +382,9 @@ h2 {
 }
 
 /* ================================
-   BOTÃO DE VOLTAR 
+   BOTÃO DE VOLTAR E ARMOR 
    ================================ */
-.btn-back {
+.btn-back, .btn-armor {
   margin-top: 2rem;
   padding: 0.8rem 2rem;
   font-size: 1.2rem;
@@ -377,7 +400,7 @@ h2 {
   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
 }
 
-.btn-back:hover {
+.btn-back:hover, .btn-armor:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
 }
@@ -393,7 +416,7 @@ h2 {
     margin-top: 1.5rem;
     padding: 1.5rem;
   }
-  .btn-back {
+  .btn-back, .btn-armor {
     font-size: 1rem;
     padding: 0.6rem 1.5rem;
   }
