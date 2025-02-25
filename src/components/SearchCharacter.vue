@@ -25,14 +25,32 @@
           <label for="username">Character Name</label>
           <input type="text" id="username" v-model="username" required />
         </div>
-        <!-- Select para 'reign' -->
-        <div class="input-group">
-          <label for="reign">Reign</label>
-          <select id="reign" v-model="reign">
-            <option value=""></option>
-            <option value="azralon">azralon</option>
-            <option value="tichondrius">tichondrius</option>
-          </select>
+        <!-- Select personalizado para 'reign' -->
+        <div class="input-group reign-select">
+          <label for="reign-search">Reign</label>
+          <input 
+            type="text" 
+            id="reign-search" 
+            v-model="searchTerm" 
+            @focus="showDropdown = true" 
+            @input="filterReigns" 
+            @blur="handleBlur"
+            @keydown.esc="closeDropdown"
+            @keydown.down.prevent="handleArrowDown"
+            @keydown.up.prevent="handleArrowUp"
+            @keydown.enter.prevent="handleEnter"
+            placeholder="Type to search..."
+          />
+          <ul v-if="showDropdown && filteredReigns.length" class="dropdown-list">
+            <li 
+              v-for="(reignOption, index) in filteredReigns" 
+              :key="reignOption" 
+              :class="{ highlighted: index === highlightedIndex }"
+              @click="selectReign(reignOption)"
+            >
+              {{ reignOption }}
+            </li>
+          </ul>
         </div>
         <button type="submit" class="btn-login">Search</button>
       </form>
@@ -54,10 +72,67 @@ export default {
     return {
       username: '',
       reign: '',
-      isMuted: true
+      searchTerm: '', 
+      showDropdown: false, 
+      allReigns: [
+        'anathema', 'arcanite reaper', 'arugal', 'ashkandi', 'atiesh', 'azuresong', 'benediction', 
+        'bigglesworth', 'blaumeux', 'bloodsail buccaneers', 'chaos bolt', 'crusader strike', 
+        'defias pillager', 'deviate delight', 'doomhowl', 'dreamscythe', 'earthfury', 'faerlina', 
+        'fairbanks', 'felstriker', 'grobbulus', 'heartseeker', 'herod', 'incendius', 'kirtonos', 
+        'kromcrush', 'kurinnaxx', 'lava lash', 'living flame', 'loatheb', 'lone wolf', 
+        'maladath (au)', 'mankrik', 'myzrael', 'netherwind', 'nightslayer', 'old blanchy', 
+        'pagle', 'penance (au)', 'rattlegore', 'remulos', 'shadowstrike (au)', 'skeram', 
+        'skull rock', 'smolderweb', 'stalagg', "sul'thraze", 'sulfuras', 'thalnos', 'thunderfury', 
+        'westfall', 'whitemane', 'wild growth', 'windseeker', 'yojamba', 'aegwynn', 'aerie peak', 
+        'agamaggan', 'aggramar', 'akama', 'alexstrasza', 'alleria', 'altar of storms', 
+        'alterac mountains', "aman'thul", 'andorhal', 'anetheron', 'antonidas', "anub'arak", 
+        'anvilmar', 'arathor', 'archimonde', 'area 52', 'argent dawn', 'arthas', 'arygos', 
+        'auchindoun', 'azgalor', 'azjol-nerub', 'azralon', 'azshara', 'azuremyst', 'baelgun', 
+        'balnazzar', 'barthilas', 'black dragonflight', 'blackhand', 'blackrock', 
+        'blackwater raiders', 'blackwing lair', "blade's edge", 'bladefist', 'bleeding hollow', 
+        'blood furnace', 'bloodhoof', 'bloodscalp', 'bonechewer', 'borean tundra', 'boulderfist', 
+        'bronzebeard', 'burning blade', 'burning legion', 'caelestrasz', 'cairne', 
+        'cenarion circle', 'cenarius', "cho'gall", 'chromaggus', 'coilfang', 'crushridge', 
+        'daggerspine', 'dalaran', 'dalvengyr', 'dark iron', 'darkspear', 'darrowmere', 
+        "dath'remar", 'dawnbringer', 'deathwing', 'demon soul', 'dentarg', 'destromath', 
+        'dethecus', 'detheroc', 'doomhammer', 'draenor', 'dragonblight', 'dragonmaw', 
+        "drak'tharon", "drak'thul", 'draka', 'drakkari', 'dreadmaul', 'drenden', 'dunemaul', 
+        'durotan', 'duskwood', 'earthen ring', 'echo isles', 'eitrigg', "eldre'thalas", 
+        'elune', 'emerald dream', 'eonar', 'eredar', 'executus', 'exodar', 'farstriders', 
+        'feathermoon', 'fenris', 'firetree', 'fizzcrank', 'frostmane', 'frostmourne', 
+        'frostwolf', 'galakrond', 'gallywix', 'garithos', 'garona', 'garrosh', 'ghostlands', 
+        'gilneas', 'gnomeregan', 'goldrinn', 'gorefiend', 'gorgonnash', 'greymane', 
+        'grizzly hills', "gul'dan", 'gundrak', 'gurubashi', 'hakkar', 'haomarush', 'hellscream', 
+        'hydraxis', 'hyjal', 'icecrown', 'illidan', 'jaedenar', "jubei'thos", "kael'thas", 
+        'kalecgos', 'kargath', "kel'thuzad", 'khadgar', 'khaz modan', "khaz'goroth", 
+        "kil'jaeden", 'kilrogg', 'kirin tor', 'korgath', 'korialstrasz', 'kul tiras', 
+        'laughing skull', 'lethon', 'lightbringer', "lightning's blade", 'lightninghoof', 
+        'llane', 'lothar', 'madoran', 'maelstrom', 'magtheridon', 'maiev', "mal'ganis", 
+        'malfurion', 'malorne', 'malygos', 'mannoroth', 'medivh', 'misha', "mok'nathal", 
+        'moon guard', 'moonrunner', "mug'thol", 'muradin', 'nagrand', 'nathrezim', 'nazgrel', 
+        'nazjatar', 'nemesis', "ner'zhul", 'nesingwary', 'nordrassil', 'norgannon', 'onyxia', 
+        'perenolde', 'proudmoore', "quel'thalas", "quel'dorei", 'ragnaros', 'ravencrest', 
+        'ravenholdt', 'rexxar', 'rivendare', 'runetotem', 'sargeras', 'saurfang', 
+        'scarlet crusade', 'scilla', "sen'jin", 'sentinels', 'shadow council', 'shadowmoon', 
+        'shadowsong', 'shandris', 'shattered halls', 'shattered hand', "shu'halo", 
+        'silver hand', 'silvermoon', 'sisters of elune', 'skullcrusher', 'skywall', 
+        'smolderthorn', 'spinebreaker', 'spirestone', 'staghelm', 'steamwheedle cartel', 
+        'stonemaul', 'stormrage', 'stormreaver', 'stormscale', 'suramar', 'tanaris', 
+        'terenas', 'terokkar', 'thaurissan', 'the forgotten coast', 'the scryers', 
+        'the underbog', 'the venture co', 'thorium brotherhood', 'thrall', 'thunderhorn', 
+        'thunderlord', 'tichondrius', 'tol barad', 'tortheldrin', 'trollbane', 'turalyon', 
+        'twisting nether', 'us ps realm 222', 'uldaman', 'uldum', 'undermine', 'ursin', 
+        'uther', 'vashj', "vek'nilash", 'velen', 'warsong', 'whisperwind', 'wildhammer', 
+        'windrunner', 'winterhoof', 'wyrmrest accord', 'ysera', 'ysondre', 'zangarmarsh', 
+        "zul'jin", 'zuluhed'
+      ],
+      filteredReigns: [],
+      isMuted: true,
+      highlightedIndex: -1
     };
   },
   mounted() {
+    this.filteredReigns = this.allReigns;
     const audio = this.$refs.bgMusic;
     audio.volume = 0.1;
     audio.play().catch(err => {
@@ -71,24 +146,70 @@ export default {
         this.$refs.bgMusic.play().catch(err => console.error(err));
       }
     },
+    handleBlur() {
+      setTimeout(() => {
+        this.showDropdown = false;
+        this.highlightedIndex = -1;
+      }, 100);
+    },
+    closeDropdown() {
+      this.showDropdown = false;
+      this.highlightedIndex = -1;
+    },
+    filterReigns() {
+      const term = this.searchTerm.toLowerCase();
+      this.filteredReigns = this.allReigns.filter(reign => reign.toLowerCase().includes(term));
+      this.showDropdown = true;
+      this.highlightedIndex = this.filteredReigns.length > 0 ? 0 : -1;
+    },
+    selectReign(reignOption) {
+      this.reign = reignOption;
+      this.searchTerm = reignOption;
+      this.showDropdown = false;
+      this.highlightedIndex = -1;
+    },
+    handleArrowDown() {
+      if (!this.showDropdown) {
+        this.showDropdown = true;
+        return;
+      }
+      if (this.filteredReigns.length === 0) return;
+      if (this.highlightedIndex < this.filteredReigns.length - 1) {
+        this.highlightedIndex++;
+      } else {
+        this.highlightedIndex = 0;
+      }
+    },
+    handleArrowUp() {
+      if (!this.showDropdown) {
+        this.showDropdown = true;
+        return;
+      }
+      if (this.filteredReigns.length === 0) return;
+      if (this.highlightedIndex > 0) {
+        this.highlightedIndex--;
+      } else {
+        this.highlightedIndex = this.filteredReigns.length - 1;
+      }
+    },
+    handleEnter() {
+      // Se houver um item destacado, seleciona-o
+      if (this.highlightedIndex >= 0 && this.highlightedIndex < this.filteredReigns.length) {
+        this.selectReign(this.filteredReigns[this.highlightedIndex]);
+      }
+    },
     async handleLogin() {
       try {
-        const token = "EUvnxC33xk3TyO2e2KvI8ZBVRbqEsD6oGI";
+        const token = "EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz";
         const response = await axios.get(
           `https://us.api.blizzard.com/profile/wow/character/${this.reign}/${this.username}/character-media?namespace=profile-us`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log(response.data);
-
-        // Pegando nome, reino e imagem do personagem
         const characterName = response.data.character.name;
         const characterRealm = response.data.character.realm.name.en_US;
-        console.log(characterRealm)
         const characterImage = response.data.assets.find(asset => asset.key === "main-raw").value;
 
-
-        // Redirecionando para a nova página com os dados
         this.$router.push({
           name: 'CharacterProfile',
           query: {
@@ -98,9 +219,9 @@ export default {
           }
         });
 
-        // Resetando os campos
         this.username = "";
         this.reign = "";
+        this.searchTerm = "";
       } catch (error) {
         console.error("Erro ao buscar personagem:", error);
         alert("Erro ao buscar personagem");
@@ -170,8 +291,7 @@ html, body {
   margin-bottom: 0.5rem;
 }
 
-.input-group input,
-.input-group select {
+.input-group input {
   width: 100%;
   padding: 0.7rem;
   font-size: 1rem;
@@ -183,8 +303,7 @@ html, body {
   box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.4);
 }
 
-.input-group input:focus,
-.input-group select:focus {
+.input-group input:focus {
   border-color: gold;
   box-shadow: 0 0 10px gold;
   outline: none;
@@ -237,6 +356,61 @@ html, body {
 .mute-btn:hover {
   background-color: rgba(0, 0, 0, 0.8);
   transform: scale(1.05);
+}
+
+/* Estilização do select personalizado */
+.reign-select {
+  position: relative;
+}
+
+.reign-select input {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  border: 2px solid #444;
+  background-color: rgba(20, 20, 20, 0.9);
+  color: white;
+  text-align: left;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.4);
+}
+
+.reign-select input:focus {
+  border-color: gold;
+  box-shadow: 0 0 10px gold;
+  outline: none;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid gold;
+  border-radius: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+.dropdown-list li {
+  padding: 0.7rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-list li.highlighted {
+  background-color: rgba(255, 215, 0, 0.2);
+}
+
+.dropdown-list li:hover {
+  background-color: rgba(255, 215, 0, 0.2);
 }
 
 /* Responsividade */

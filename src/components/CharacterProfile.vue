@@ -17,75 +17,58 @@
 
       <!-- Container para a imagem -->
       <div class="image-container">
-        <img :src="image" alt="Personagem" class="character-image" />
+        <div v-if="!imageLoaded" class="loading-spinner"></div>
+        <img 
+          :src="image" 
+          alt="Personagem" 
+          class="character-image" 
+          @load="imageLoaded = true"
+        />
       </div>
 
-      <!-- Container de Estatísticas (aparece somente se 'stats' não for nulo) -->
-      <div class="stats-container" v-if="stats">
-        <h3>Statistics</h3>
-        <ul class="stats-grid">
-          <!-- HEALTH -->
-          <li v-if="stats.health" class="stat-item stat-health">
-            <div class="stat-value">{{ stats.health }}</div>
-            <div class="stat-label">HEALTH</div>
-          </li>
-
-          <!-- POWER -->
-          <li v-if="stats.power" class="stat-item stat-power">
-            <div class="stat-value">{{ stats.power }}</div>
-            <div class="stat-label">ENERGY</div>
-          </li>
-
-          <!-- SPEED (exibe rating e bonus) -->
-          <li v-if="stats.speed" class="stat-item stat-speed">
-            <div class="stat-value">
-              {{ stats.speed.rating }}
-              <span v-if="stats.speed.rating_bonus">
-              </span>
-            </div>
-            <div class="stat-label">SPEED</div>
-          </li>
-
-          <!-- AGILITY -->
-          <li v-if="stats.agility" class="stat-item stat-agility">
-            <div class="stat-value">
-              {{ stats.agility.effective }}
-              <span v-if="stats.agility.base">
-              </span>
-            </div>
-            <div class="stat-label">AGILITY</div>
-          </li>
-
-          <!-- CRITICAL STRIKE -->
-          <li v-if="stats.intellect" class="stat-item stat-critical">
-            <div class="stat-value">
-              {{ stats.melee_crit.value.toFixed(2) }} %
-              <span v-if="stats.intellect.base">
-              </span>
-            </div>
-            <div class="stat-label">CRITICAL STRIKE</div>
-          </li>
-
-          <!-- HASTE -->
-          <li v-if="stats.stamina" class="stat-item stat-haste">
-            <div class="stat-value">
-              {{ stats.melee_haste.value.toFixed(2) }} %
-              <span v-if="stats.stamina.base">
-              </span>
-            </div>
-            <div class="stat-label">HASTE</div>
-          </li>
-
-          <!-- MASTERY -->
-          <li v-if="stats.stamina" class="stat-item stat-mastery">
-            <div class="stat-value">
-              {{ stats.mastery.value.toFixed(1) }} %
-              <span v-if="stats.stamina.base">
-              </span>
-            </div>
-            <div class="stat-label">MASTERY</div>
-          </li>
-        </ul>
+      <!-- Container de Estatísticas -->
+      <div class="stats-container">
+        <div v-if="!stats" class="loading-spinner"></div>
+        <div v-else>
+          <h3>Statistics</h3>
+          <ul class="stats-grid">
+            <!-- HEALTH -->
+            <li v-if="stats.health" class="stat-item stat-health">
+              <div class="stat-value">{{ stats.health }}</div>
+              <div class="stat-label">HEALTH</div>
+            </li>
+            <!-- POWER -->
+            <li v-if="stats.power" class="stat-item stat-power">
+              <div class="stat-value">{{ stats.power }}</div>
+              <div class="stat-label">ENERGY</div>
+            </li>
+            <!-- SPEED -->
+            <li v-if="stats.speed" class="stat-item stat-speed">
+              <div class="stat-value">{{ stats.speed.rating }}</div>
+              <div class="stat-label">SPEED</div>
+            </li>
+            <!-- AGILITY -->
+            <li v-if="stats.agility" class="stat-item stat-agility">
+              <div class="stat-value">{{ stats.agility.effective }}</div>
+              <div class="stat-label">AGILITY</div>
+            </li>
+            <!-- CRITICAL STRIKE -->
+            <li v-if="stats.intellect" class="stat-item stat-critical">
+              <div class="stat-value">{{ stats.melee_crit.value.toFixed(2) }} %</div>
+              <div class="stat-label">CRITICAL STRIKE</div>
+            </li>
+            <!-- HASTE -->
+            <li v-if="stats.stamina" class="stat-item stat-haste">
+              <div class="stat-value">{{ stats.melee_haste.value.toFixed(2) }} %</div>
+              <div class="stat-label">HASTE</div>
+            </li>
+            <!-- MASTERY -->
+            <li v-if="stats.stamina" class="stat-item stat-mastery">
+              <div class="stat-value">{{ stats.mastery.value.toFixed(1) }} %</div>
+              <div class="stat-label">MASTERY</div>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- Botão de Voltar -->
@@ -104,7 +87,8 @@ export default {
       name: this.$route.query.name || 'Desconhecido',
       realm: this.$route.query.realm || 'Desconhecido',
       image: this.$route.query.image || '',
-      stats: null
+      stats: null,
+      imageLoaded: false // Nova variável para controlar o carregamento da imagem
     };
   },
   mounted() {
@@ -116,8 +100,7 @@ export default {
     },
     async fetchStats() {
       try {
-        // Substitua pelo seu token, se necessário
-        const token = "EUvnxC33xk3TyO2e2KvI8ZBVRbqEsD6oGI";
+        const token = "EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz";
         const realmParam = this.realm.toLowerCase();
         const nameParam = this.name.toLowerCase();
         const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/statistics?namespace=profile-us&locale=en_US`;
@@ -138,15 +121,6 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
-
-/* 
-  Fonte e variáveis de cor (caso deseje usar variáveis)
-  :root {
-    --primary-color: #c9b37f;
-    --secondary-color: #bda65b;
-    --dark-bg: #0b0b0b;
-  }
-*/
 
 /* ================================
    WRAPPER GERAL 
@@ -345,6 +319,25 @@ h2 {
   text-transform: uppercase;
   letter-spacing: 1px;
   opacity: 0.9;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #c9b37f;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Animação do spin */
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* Classes para colorir cada stat */
