@@ -6,16 +6,13 @@
       Seu navegador não suporta vídeos em HTML5.
     </video>
 
-    <!-- Overlay de gradiente para deixar o vídeo mais escuro -->
+    <!-- Overlay de gradiente -->
     <div class="overlay"></div>
 
     <div class="profile-container">
-      <!-- Título do Personagem -->
       <h1>{{ name }}</h1>
-      <!-- Reino -->
       <h2>Reino: {{ realm }}</h2>
 
-      <!-- Container para a imagem -->
       <div class="image-container">
         <div v-if="!imageLoaded" class="loading-spinner"></div>
         <img 
@@ -32,46 +29,15 @@
         <div v-else>
           <h3>Statistics</h3>
           <ul class="stats-grid">
-            <!-- HEALTH -->
-            <li v-if="stats.health" class="stat-item stat-health">
-              <div class="stat-value">{{ stats.health }}</div>
-              <div class="stat-label">HEALTH</div>
-            </li>
-            <!-- POWER -->
-            <li v-if="stats.power" class="stat-item stat-power">
-              <div class="stat-value">{{ stats.power }}</div>
-              <div class="stat-label">ENERGY</div>
-            </li>
-            <!-- SPEED -->
-            <li v-if="stats.speed" class="stat-item stat-speed">
-              <div class="stat-value">{{ stats.speed.rating }}</div>
-              <div class="stat-label">SPEED</div>
-            </li>
-            <!-- AGILITY -->
-            <li v-if="stats.agility" class="stat-item stat-agility">
-              <div class="stat-value">{{ stats.agility.effective }}</div>
-              <div class="stat-label">AGILITY</div>
-            </li>
-            <!-- CRITICAL STRIKE -->
-            <li v-if="stats.intellect" class="stat-item stat-critical">
-              <div class="stat-value">{{ stats.melee_crit.value.toFixed(2) }} %</div>
-              <div class="stat-label">CRITICAL STRIKE</div>
-            </li>
-            <!-- HASTE -->
-            <li v-if="stats.stamina" class="stat-item stat-haste">
-              <div class="stat-value">{{ stats.melee_haste.value.toFixed(2) }} %</div>
-              <div class="stat-label">HASTE</div>
-            </li>
-            <!-- MASTERY -->
-            <li v-if="stats.stamina" class="stat-item stat-mastery">
-              <div class="stat-value">{{ stats.mastery.value.toFixed(1) }} %</div>
-              <div class="stat-label">MASTERY</div>
+            <li v-for="stat in statList" :key="stat.key" class="stat-item" :class="`stat-${stat.key}`">
+              <img :src="statIcons[stat.key]" :alt="`${stat.label} Icon`" class="stat-icon" />
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
             </li>
           </ul>
         </div>
       </div>
 
-      <!-- Botão de Voltar -->
       <button @click="goBack" class="btn-back">Voltar</button>
     </div>
   </div>
@@ -88,8 +54,33 @@ export default {
       realm: this.$route.query.realm || 'Desconhecido',
       image: this.$route.query.image || '',
       stats: null,
-      imageLoaded: false // Nova variável para controlar o carregamento da imagem
+      imageLoaded: false,
+      statIcons: {
+        health: require('@/assets/icons/health.svg'),
+        power: require('@/assets/icons/energy.svg'),
+        stamina: require('@/assets/icons/stamina.svg'),
+        agility: require('@/assets/icons/agility.svg'),
+        critical: require('@/assets/icons/critical.svg'),
+        haste: require('@/assets/icons/haste.svg'),
+        mastery: require('@/assets/icons/mastery.svg'),
+        versatility: require('@/assets/icons/versatility.svg'),
+      },
     };
+  },
+  computed: {
+    statList() {
+      if (!this.stats) return [];
+      return [
+        { key: 'health', label: 'HEALTH', value: this.stats.health },
+        { key: 'power', label: 'ENERGY', value: this.stats.power },
+        { key: 'stamina', label: 'STAMINA', value: this.stats.stamina?.effective },
+        { key: 'agility', label: 'AGILITY', value: this.stats.agility?.effective },
+        { key: 'critical', label: 'CRITICAL STRIKE', value: this.stats.melee_crit?.value.toFixed(2) + ' %' },
+        { key: 'haste', label: 'HASTE', value: this.stats.melee_haste?.value.toFixed(2) + ' %' },
+        { key: 'mastery', label: 'MASTERY', value: this.stats.mastery?.value.toFixed(1) + ' %' },
+        { key: 'versatility', label: 'VERSATILITY', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
+      ].filter(stat => stat.value !== undefined);
+    },
   },
   mounted() {
     this.fetchStats();
@@ -114,8 +105,8 @@ export default {
       } catch (error) {
         console.error("Erro ao buscar estatísticas:", error);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -136,10 +127,7 @@ export default {
   justify-content: center;
 }
 
-/* 
-  VÍDEO DE FUNDO 
-  Mantém a animação ao fundo 
-*/
+/* Vídeo de fundo */
 .background-video {
   position: absolute;
   top: 50%;
@@ -148,24 +136,17 @@ export default {
   height: 100%;
   object-fit: cover;
   transform: translate(-50%, -50%);
-  z-index: -2; /* Fica atrás de tudo */
+  z-index: -2;
 }
 
-/* 
-  OVERLAY - gradiente escuro 
-  para deixar o vídeo mais suave 
-*/
+/* Overlay */
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.8),
-    rgba(0, 0, 0, 0.4)
-  );
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4));
   z-index: -1;
 }
 
@@ -178,23 +159,17 @@ export default {
   max-width: 1100px;
   width: 90%;
   min-height: 80vh;
-
-  /* Glass morphism */
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px) saturate(180%);
   -webkit-backdrop-filter: blur(8px) saturate(180%);
-  
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 15px;
   padding: 2rem;
   margin: 2rem 0;
-  
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* para não "forçar" no centro vertical */
-  
-  /* Sombra leve */
+  justify-content: flex-start;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   transition: all 0.3s ease;
 }
@@ -225,25 +200,20 @@ h2 {
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-
-  /* Borda com leve transparência */
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  
   box-shadow: 0 0 30px rgba(189, 166, 91, 0.2);
   transition: transform 0.3s ease;
 }
 
-/* Animação ao passar o mouse na imagem */
 .image-container:hover {
   transform: scale(1.02);
 }
 
-/* IMAGEM DO PERSONAGEM */
 .character-image {
   width: 100%;
   height: 100%;
@@ -260,12 +230,9 @@ h2 {
   max-width: 800px;
   margin-top: 1rem;
   padding: 2rem;
-  
-  /* Glass morphism mais suave */
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
@@ -281,11 +248,28 @@ h2 {
 /* Layout em grid para as estatísticas */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   list-style: none;
   padding: 0;
   margin: 0 auto;
+}
+
+/* Responsividade do grid */
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Cartão individual de cada stat */
@@ -299,13 +283,11 @@ h2 {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hover nos cartões */
 .stat-item:hover {
   transform: translateY(-5px) scale(1.03);
   box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
 }
 
-/* Valor em destaque */
 .stat-value {
   font-size: 1.6rem;
   font-weight: bold;
@@ -313,7 +295,6 @@ h2 {
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
 }
 
-/* Label da stat */
 .stat-label {
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -334,7 +315,6 @@ h2 {
   transform: translate(-50%, -50%);
 }
 
-/* Animação do spin */
 @keyframes spin {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
@@ -342,36 +322,40 @@ h2 {
 
 /* Classes para colorir cada stat */
 .stat-health {
-  color: #27ae60;
-  border-color: #27ae60;
+  color: #27cc4e;
+  border-color: #27cc4e;
 }
 .stat-power {
-  color: #ffc300;
-  border-color: #ffc300;
+  color: #cb9501;
+  border-color: #cb9501;
 }
-.stat-speed {
-  color: #3498db;
-  border-color: #3498db;
+.stat-stamina {
+  color: #ff8b2d;
+  border-color: #ff8b2d;
 }
 .stat-strength {
   color: #ff5733;
   border-color: #ff5733;
 }
 .stat-agility {
-  color: #d68910;
-  border-color: #d68910;
+  color: #ffd955;
+  border-color: #ffd955;
 }
 .stat-critical {
-  color: #ff2600;
-  border-color: #ff0000;
+  color: #e01c1c;
+  border-color: #e01c1c;
 }
 .stat-haste {
-  color: #48c9b0;
-  border-color: #48c9b0;
+  color: #0ed59b;
+  border-color: #0ed59b;
 }
 .stat-mastery {
-  color: #6702aa;
-  border-color: #530097;
+  color: #9256ff;
+  border-color: #9256ff;
+}
+.stat-versatility {
+  color: #bfbfbf;
+  border-color: #bfbfbf;
 }
 
 /* ================================
@@ -385,11 +369,7 @@ h2 {
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(201, 179, 127, 0.8),
-    rgba(189, 166, 91, 0.8)
-  );
+  background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
   border: none;
   border-radius: 25px;
   cursor: pointer;
@@ -417,5 +397,42 @@ h2 {
     font-size: 1rem;
     padding: 0.6rem 1.5rem;
   }
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.stat-icon {
+  display: block;
+  margin-left: 10% auto 1vw auto; /* centers horizontally, with bottom margin */
+  width: 4vw;
+  height: 4vw;
+}
+
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
 }
 </style>
