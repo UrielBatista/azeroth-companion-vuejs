@@ -1,6 +1,6 @@
 <template>
   <div class="modal-backdrop" @click.self="$emit('close')">
-    <div class="modal">
+    <div class="modal" :style="{ '--background-image': `url(${backgroundImage})` }">
       <h2 class="modal-title">Armor level: {{ averageIlvl }}</h2>
       <div v-if="showSpinner" class="loading-container">
         <div class="spinner"></div>
@@ -113,6 +113,10 @@ export default {
       type: String,
       required: true,
     },
+    backgroundImage: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -161,7 +165,6 @@ export default {
       this.isLoading = true;
       const token = process.env.VUE_APP_WOW_TOKEN;
       const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-
       try {
         const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
         const responseEquipments = await apiFetch(equipmentUrl);
@@ -269,7 +272,10 @@ export default {
 }
 
 .modal {
-  background: rgba(255, 255, 255, 0.08);
+  background-image: var(--background-image);
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
   backdrop-filter: blur(8px) saturate(180%);
   -webkit-backdrop-filter: blur(8px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -374,7 +380,7 @@ export default {
 
 .central-display {
   z-index: -1;
-  width: 60%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

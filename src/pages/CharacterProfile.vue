@@ -14,10 +14,10 @@
       <h1>{{ name }}-{{ realm }}</h1>
       <character-details :details="characterInfo" />
 
-      <div class="image-container">
+      <div class="image-container" :style="{ '--background-image': `url(${backgroundImage})` }">
         <div v-if="!imageLoaded" class="loading-spinner"></div>
         <img 
-          :src="image" 
+          :src="imageArmor" 
           alt="Personagem" 
           class="character-image"
           @click="openArmorModal"
@@ -66,13 +66,14 @@
       <armor-modal 
         v-if="showArmorModal" 
         :character-image="imageArmor"
+        :backgroundImage="backgroundImage"
         :name="name"
         :realm="realm"
         :averageIlvl="characterInfo.averageIlvl"
         @close="showArmorModal = false" 
       />
 
-      <button @click="goBack" class="btn-back">Voltar</button>
+      <button @click="goBack" class="btn-back">Exit</button>
     </div>
   </div>
 </template>
@@ -81,6 +82,21 @@
 import axios from 'axios';
 import ArmorModal from '../components/ModalViewer.vue';
 import CharacterDetails from '../components/CharacterDetails.vue';
+
+// Importação explícita dos arquivos .webp
+import deathknightBackground from '@/assets/deathknight-background.webp';
+import demonhunterBackground from '@/assets/demonhunter-background.webp';
+import dragonBackground from '@/assets/dragon-background.webp';
+import druidBackground from '@/assets/druid-background.webp';
+import hunterBackground from '@/assets/hunter-background.webp';
+import mageBackground from '@/assets/mage-background.webp';
+import monkBackground from '@/assets/monk-background.webp';
+import paladinBackground from '@/assets/paladin-background.webp';
+import priestBackground from '@/assets/prist-background.webp';
+import rogueBackground from '@/assets/rogue-background.webp';
+import warlockBackground from '@/assets/warlock-background.webp';
+import warriorBackground from '@/assets/warrior-background.webp';
+import shamanBackground from '@/assets/xama-background.webp';
 
 export default {
   name: 'CharacterProfile',
@@ -102,8 +118,7 @@ export default {
       },
       name: this.$route.query.name || 'Unknown',
       realm: this.$route.query.realm || 'Unknown',
-      imageArmor: require('@/assets/character.png'),
-      image: this.$route.query.image || '',
+      imageArmor: this.$route.query.image || '',
       stats: null,
       imageLoaded: false,
       showArmorModal: false,
@@ -116,6 +131,22 @@ export default {
         haste: require('@/assets/icons/haste.svg'),
         mastery: require('@/assets/icons/mastery.svg'),
         versatility: require('@/assets/icons/versatility.svg'),
+      },
+      // Mapeamento das classes para os arquivos .webp importados
+      classBackgrounds: {
+        'Death Knight': deathknightBackground,
+        'Demon Hunter': demonhunterBackground,
+        'Dragon': dragonBackground,
+        'Druid': druidBackground,
+        'Hunter': hunterBackground,
+        'Mage': mageBackground,
+        'Monk': monkBackground,
+        'Paladin': paladinBackground,
+        'Priest': priestBackground,
+        'Rogue': rogueBackground,
+        'Warlock': warlockBackground,
+        'Warrior': warriorBackground,
+        'Shaman': shamanBackground,
       },
     };
   },
@@ -132,6 +163,12 @@ export default {
         { key: 'mastery', label: 'MASTERY', value: this.stats.mastery?.value.toFixed(1) + ' %' },
         { key: 'versatility', label: 'VERSATILITY', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
       ].filter(stat => stat.value !== undefined);
+    },
+    // Propriedade computada para o background dinâmico
+    backgroundImage() {
+      const classType = this.characterInfo.classtype || 'Rogue'; // Default para 'Rogue'
+      const background = this.classBackgrounds[classType] || this.classBackgrounds['Rogue']; // Fallback para Rogue
+      return background;
     },
   },
   mounted() {
@@ -156,7 +193,6 @@ export default {
 
       } catch (error) {
         console.error('Erro ao buscar dados do personagem:', error);
-        // Fallback to query params if API fails
         this.name = this.$route.query.name || 'Unknown';
         this.realm = this.$route.query.realm || 'Unknown';
         this.level = this.$route.query.level || 0;
@@ -280,6 +316,21 @@ h2 {
 /* ================================
    CONTAINER DA IMAGEM 
    ================================ */
+.image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--background-image); /* Usa a variável CSS definida no v-bind */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(6px); /* Aplica o desfoque apenas ao fundo */
+  z-index: -1; /* Coloca o fundo atrás da imagem */
+}
+
 .image-container {
   width: 850px;
   height: 600px;
@@ -292,13 +343,7 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   overflow: hidden;
-  background-image: url('@/assets/background-character.webp');
-  background-size: cover; 
-  background-position: center; 
-  background-repeat: no-repeat;
   position: relative;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   box-shadow: 0 0 30px rgba(189, 166, 91, 0.2);
   transition: transform 0.3s ease;
 }
@@ -312,7 +357,9 @@ h2 {
   height: 100%;
   object-fit: cover;
   image-rendering: crisp-edges;
-  filter: contrast(1.2) saturate(1.1);
+  filter: contrast(1.2) saturate(1.1); /* Mantém os filtros originais da imagem do personagem */
+  position: relative;
+  z-index: 1; /* Garante que a imagem fique acima do fundo desfocado */
 }
 
 /* ================================
