@@ -10,8 +10,9 @@
     <div class="overlay"></div>
 
     <div class="profile-container">
-      <h1>{{ name }}</h1>
-      <h2>Reign: {{ realm }}</h2>
+      <div v-if="!stats" class="loading-spinner"></div>
+      <h1>{{ name }}-{{ realm }}</h1>
+      <character-details :details="characterInfo" />
 
       <div class="image-container">
         <div v-if="!imageLoaded" class="loading-spinner"></div>
@@ -45,8 +46,7 @@
         <div v-else>
           <h3>Pvp (WIP)</h3>
           <ul class="stats-grid">
-            <li>
-            </li>
+            <li></li>
           </ul>
         </div>
       </div>
@@ -57,8 +57,7 @@
         <div v-else>
           <h3>Improvement your gameplay with IA (WIP)</h3>
           <ul class="stats-grid">
-            <li>
-            </li>
+            <li></li>
           </ul>
         </div>
       </div>
@@ -69,6 +68,7 @@
         :character-image="imageArmor"
         :name="name"
         :realm="realm"
+        :averageIlvl="characterInfo.averageIlvl"
         @close="showArmorModal = false" 
       />
 
@@ -79,22 +79,34 @@
 
 <script>
 import axios from 'axios';
-import ArmorModal from './ModalViewer.vue';
+import ArmorModal from '../components/ModalViewer.vue';
+import CharacterDetails from '../components/CharacterDetails.vue';
 
 export default {
   name: 'CharacterProfile',
   components: {
     ArmorModal,
+    CharacterDetails,
   },
   data() {
     return {
-      name: this.$route.query.name || 'Unknow',
-      realm: this.$route.query.realm || 'Unknow',
-      image: this.$route.query.image || '',
+      characterInfo: {
+        level: 0,
+        faction: '',
+        averageIlvl: 0,
+        spec: '',
+        race: '',
+        classtype: '',
+        guild: '',
+        lastLogin: null
+      },
+      name: this.$route.query.name || 'Unknown',
+      realm: this.$route.query.realm || 'Unknown',
       imageArmor: require('@/assets/character.png'),
+      image: this.$route.query.image || '',
       stats: null,
       imageLoaded: false,
-      showArmorModal: false, // Control modal visibility
+      showArmorModal: false,
       statIcons: {
         health: require('@/assets/icons/health.svg'),
         power: require('@/assets/icons/energy.svg'),
@@ -123,28 +135,61 @@ export default {
     },
   },
   mounted() {
+    this.fetchCharacterData();
     this.fetchStats();
   },
   methods: {
     goBack() {
       this.$router.push({ name: 'SearchCharacter' });
     },
+    async fetchCharacterData() {
+      try {
+        const token = process.env.VUE_APP_WOW_TOKEN;
+        const realmParam = this.realm.toLowerCase();
+        const nameParam = this.name.toLowerCase();
+        const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}?namespace=profile-us&locale=en_US`;
+        const response = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        this.updateCharacterData(response.data);
+
+      } catch (error) {
+        console.error('Erro ao buscar dados do personagem:', error);
+        // Fallback to query params if API fails
+        this.name = this.$route.query.name || 'Unknown';
+        this.realm = this.$route.query.realm || 'Unknown';
+        this.level = this.$route.query.level || 0;
+      }
+    },
     async fetchStats() {
       try {
-        const token = "EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz";
+        const token = process.env.VUE_APP_WOW_TOKEN;
         const realmParam = this.realm.toLowerCase();
         const nameParam = this.name.toLowerCase();
         const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/statistics?namespace=profile-us&locale=en_US`;
 
         const response = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         this.stats = response.data;
-        console.log("Estatísticas:", this.stats);
       } catch (error) {
-        console.error("Erro ao buscar estatísticas:", error);
+        console.error('Erro ao buscar estatísticas:', error);
       }
+    },
+    updateCharacterData(data) {
+      this.characterInfo = {
+        ...this.characterInfo,
+        level: data.level || 0,
+        averageIlvl: data.average_item_level,
+        faction: data.faction?.name || '',
+        spec: data.active_spec?.name || '',
+        race: data.race?.name || '',
+        classtype: data.character_class?.name || '',
+        guild: data.guild?.name || '',
+        lastLogin: data.last_login_timestamp || null
+      };
     },
     openArmorModal() {
       this.showArmorModal = true;
@@ -154,7 +199,7 @@ export default {
 </script>
 
 <style scoped>
-/* Keep all existing styles from the original CharacterProfile.vue */
+/* Existing styles remain unchanged */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
 /* ================================
@@ -369,42 +414,15 @@ h2 {
 }
 
 /* Classes para colorir cada stat */
-.stat-health {
-  color: #27cc4e;
-  border-color: #27cc4e;
-}
-.stat-power {
-  color: #cb9501;
-  border-color: #cb9501;
-}
-.stat-stamina {
-  color: #ff8b2d;
-  border-color: #ff8b2d;
-}
-.stat-strength {
-  color: #ff5733;
-  border-color: #ff5733;
-}
-.stat-agility {
-  color: #ffd955;
-  border-color: #ffd955;
-}
-.stat-critical {
-  color: #e01c1c;
-  border-color: #e01c1c;
-}
-.stat-haste {
-  color: #0ed59b;
-  border-color: #0ed59b;
-}
-.stat-mastery {
-  color: #9256ff;
-  border-color: #9256ff;
-}
-.stat-versatility {
-  color: #bfbfbf;
-  border-color: #bfbfbf;
-}
+.stat-health { color: #27cc4e; border-color: #27cc4e; }
+.stat-power { color: #cb9501; border-color: #cb9501; }
+.stat-stamina { color: #ff8b2d; border-color: #ff8b2d; }
+.stat-strength { color: #ff5733; border-color: #ff5733; }
+.stat-agility { color: #ffd955; border-color: #ffd955; }
+.stat-critical { color: #e01c1c; border-color: #e01c1c; }
+.stat-haste { color: #0ed59b; border-color: #0ed59b; }
+.stat-mastery { color: #9256ff; border-color: #9256ff; }
+.stat-versatility { color: #bfbfbf; border-color: #bfbfbf; }
 
 /* ================================
    BOTÃO DE VOLTAR E ARMOR 
@@ -468,7 +486,6 @@ h2 {
   width: 4vw;
   height: 4vw;
 }
-
 
 .stat-value {
   font-size: 1.6rem;

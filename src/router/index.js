@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import SearchCharacter from '../components/SearchCharacter.vue'
-import Profile from '../components/CharacterProfile.vue'
+import SearchCharacter from '../pages/SearchCharacter.vue'
+import Profile from '../pages/CharacterProfile.vue'
 
 const routes = [
   {

@@ -204,7 +204,8 @@ export default {
       }
 
       try {
-        const token = "EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz";
+        const token = process.env.VUE_APP_WOW_TOKEN;
+        console.log(token);
         const response = await axios.get(
           `https://us.api.blizzard.com/profile/wow/character/${this.reign}/${this.username}/character-media?namespace=profile-us`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -219,7 +220,7 @@ export default {
           query: {
             name: characterName,
             realm: characterRealm,
-            image: characterImage
+            image: characterImage,
           }
         });
 
@@ -374,7 +375,7 @@ html, body {
   border: 2px solid #444;
   background-color: rgba(20, 20, 20, 0.9);
   color: white;
-  text-align: left;
+  text-align: center;
   border-radius: 5px;
   box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.4);
 }

@@ -1,10 +1,13 @@
 <template>
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal">
-      <h2 class="modal-title">Armor</h2>
-      <!-- Show spinner if loading or if no equipment items were found -->
+      <h2 class="modal-title">Armor level: {{ averageIlvl }}</h2>
       <div v-if="showSpinner" class="loading-container">
         <div class="spinner"></div>
+        
+      </div>
+      <div v-else-if="!hasEquipment" class="no-equipment">
+        <p>No equipment found for this character.</p>
       </div>
       <div v-else class="modal-content">
         <div class="side-panel left">
@@ -36,12 +39,10 @@
           </div>
         </div>
 
-        <!-- Central Display (unique character image) -->
         <div class="central-display">
           <img :src="characterImage" alt="Character Armor" />
         </div>
 
-        <!-- Right Thumbnails (unique items, e.g., weapons or accessories) -->
         <div class="side-panel right">
           <div
             v-for="item in rightItems"
@@ -71,7 +72,6 @@
           </div>
         </div>
 
-        <!-- Bottom Icons (e.g., weapons) -->
         <div class="bottom-icons">
           <div 
             v-for="icon in bottomIcons" 
@@ -93,7 +93,7 @@
                     +{{ stat.value }} {{ stat.name }}
                   </li>
                 </ul>
-                <p v-if="icon.details.socket">Socket: {{ icon.details.socket }}</p>
+                <p v-if="icon.details.socket">Socket: {{ item.details.socket }}</p>
                 <p>Requires Level: {{ icon.details.requiredLevel }}</p>
                 <p>Sell Price: {{ icon.details.sellPrice }}</p>
               </div>
@@ -105,217 +105,154 @@
   </div>
 </template>
   
-  <script>
-  export default {
-    name: 'ArmorModal',
-    props: {
-      characterImage: {
-        type: String,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      realm: {
-        type: String,
-        required: true,
-      },
+<script>
+export default {
+  name: 'ArmorModal',
+  props: {
+    characterImage: {
+      type: String,
+      required: true,
     },
-    data() {
-      return {
-        isLoading: true,
-        currentPiece: null,
-        currentRightItem: null,
-        currentBottomIcons: null,
-        armorPieces: [],
-        rightItems: [],
-        bottomIcons: [],
-      };
+    name: {
+      type: String,
+      required: true,
     },
-    computed: {
-      // Show spinner if still loading or if no equipment is available.
-      showSpinner() {
-        return (
-          this.isLoading ||
-          (this.armorPieces.length === 0 &&
-            this.rightItems.length === 0 &&
-            this.bottomIcons.length === 0)
-        );
-      },
+    realm: {
+      type: String,
+      required: true,
     },
-    methods: {
-      selectPiece(piece) {
-        this.currentPiece = piece;
-      },
-      selectRightItem(item) {
-        this.currentRightItem = item;
-      },
-      selectBottomIcons(icon) {
-        this.currentBottomIcons = icon;
-      },
-      async fetchItemMedia(itemId) {
-        try {
-          const url = `https://us.api.blizzard.com/data/wow/media/item/${itemId}?namespace=static-us&locale=en_US`;
-          const response = await fetch(url, {
-            headers: {
-              'Authorization': 'Bearer EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz'
-            }
-          });
-  
-          if (!response.ok) {
-            throw new Error(`Erro ao buscar media do item ${itemId}`);
-          }
-  
-          const data = await response.json();
-          return data.assets && data.assets.length > 0 ? data.assets[0].value : null;
-        } catch (error) {
-          console.error('Erro ao carregar media do item:', error);
-          return null;
-        }
-      },
-      async fetchEquipment() {
-        try {
-          const url = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
-          const responseEquipaments = await fetch(url, {
-            headers: {
-              'Authorization': 'Bearer EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz'
-            }
-          });
-          
-          if (!responseEquipaments.ok) {
-            throw new Error('Erro ao buscar equipamento');
-          }
-  
-          const data = await responseEquipaments.json();
-          const equipment = data.equipped_items || [];
-  
-          const slotMapping = {
-            'HEAD': 'Head',
-            'NECK': 'Neck',
-            'SHOULDER': 'Shoulder',
-            'BACK': 'Back',
-            'CHEST': 'Chest',
-            'SHIRT': 'Shirt',
-            'TABARD': 'Tabard',
-            'WRIST': 'Wrist',
-            'HANDS': 'Hands',
-            'WAIST': 'Waist',
-            'LEGS': 'Legs',
-            'FEET': 'Feet',
-            'FINGER_1': 'Finger_1',
-            'FINGER_2': 'Finger_2',
-            'TRINKET_1': 'Trinket_1',
-            'TRINKET_2': 'Trinket_2',
-            'MAIN_HAND': 'Main_hand',
-            'OFF_HAND': 'Off_hand'
-          };
-  
-          const armorPiecesTemp = [];
-          const rightItemsTemp = [];
-          const bottomIconsTemp = [];
-  
-          // Process each equipped item and fetch its media
-          for (const item of equipment) {
-            const slotName = slotMapping[item.slot.type];
-            if (!slotName) continue;
-  
-            const mediaUrl = `https://us.api.blizzard.com/data/wow/media/item/${item.item.id}?namespace=static-us&locale=en_US`;
-            const imageResponse = await fetch(mediaUrl, {
-              headers: {
-                'Authorization': 'Bearer EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz'
-              }
-            });
-  
-            if (!imageResponse.ok) {
-              throw new Error('Erro ao buscar imagens');
-            }
+    averageIlvl: {
+      type: Number,
+      required: true,
+      default: 0,
+    }
+  },
+  data() {
+    return {
+      isLoading: true,
+      currentPiece: null,
+      currentRightItem: null,
+      currentBottomIcons: null,
+      armorPieces: [],
+      rightItems: [],
+      bottomIcons: [],
+    };
+  },
+  computed: {
+    showSpinner() {
+      return this.isLoading;
+    },
+    hasEquipment() {
+      return this.armorPieces.length > 0 || this.rightItems.length > 0 || this.bottomIcons.length > 0;
+    },
+  },
+  methods: {
+    
+    selectPiece(piece) {
+      this.currentPiece = piece;
+    },
+    selectRightItem(item) {
+      this.currentRightItem = item;
+    },
+    selectBottomIcons(icon) {
+      this.currentBottomIcons = icon;
+    },
+    async fetchEquipment() {
+      this.isLoading = true;
+      const token = process.env.VUE_APP_WOW_TOKEN;
+      const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
 
-            // Fetch item details (stats, level, etc.)
-            const itemDetailsUrl = `https://us.api.blizzard.com/data/wow/item/${item.item.id}?namespace=static-us&locale=en_US`;
-            const detailsResponse = await fetch(itemDetailsUrl, {
-              headers: {
-                'Authorization': 'Bearer EU1AXooVLenxCzfLs17haPrA7R58kQ3vmz'
-              }
-            });
+      try {
+        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
+        const responseEquipments = await apiFetch(equipmentUrl);
 
-            if (!detailsResponse.ok) {
-              throw new Error('Erro ao buscar detalhes do item');
-            }
+        if (!responseEquipments.ok) throw new Error('Failed to fetch equipment');
 
+        const data = await responseEquipments.json();
+        const equipment = data.equipped_items || [];
+
+        const slotMapping = {
+          'HEAD': 'Head', 'NECK': 'Neck', 'SHOULDER': 'Shoulder', 'BACK': 'Back',
+          'CHEST': 'Chest', 'SHIRT': 'Shirt', 'TABARD': 'Tabard', 'WRIST': 'Wrist',
+          'HANDS': 'Hands', 'WAIST': 'Waist', 'LEGS': 'Legs', 'FEET': 'Feet',
+          'FINGER_1': 'Finger_1', 'FINGER_2': 'Finger_2', 'TRINKET_1': 'Trinket_1',
+          'TRINKET_2': 'Trinket_2', 'MAIN_HAND': 'Main_hand', 'OFF_HAND': 'Off_hand',
+        };
+
+        const itemPromises = equipment.map(async item => {
+          const slotName = slotMapping[item.slot.type];
+          if (!slotName) return null;
+
+          const mediaUrl = `https://us.api.blizzard.com/data/wow/media/item/${item.item.id}?namespace=static-us&locale=en_US`;
+          const detailsUrl = `https://us.api.blizzard.com/data/wow/item/${item.item.id}?namespace=static-us&locale=en_US`;
+
+          try {
+            const [mediaResponse, detailsResponse] = await Promise.all([
+              apiFetch(mediaUrl),
+              apiFetch(detailsUrl),
+            ]);
+
+            if (!mediaResponse.ok || !detailsResponse.ok) return null;
+
+            const mediaData = await mediaResponse.json();
             const detailsData = await detailsResponse.json();
-            
-            const itemDetails = {
-              name: detailsData.name || slotName,
-              itemLevel: detailsData.level || 0,
-              transmog: item.is_transmogrified ? item.display.slot.type : 'None', // Adjust based on API response
-              bind: detailsData.binding?.type === 'ON_PICKUP' ? 'Binds when picked up' : null,
-              type: detailsData.inventory_type?.type || 'Leather', // Adjust based on item type
-              stats: detailsData.preview_item.stats?.map(stat => ({
-                name: stat.type.name,
-                value: stat.value
-              })) || [],
-              socket: detailsData.sockets ? 'Socket Available' : null,
-              requiredLevel: detailsData.required_level || 0,
-              sellPrice: this.formatSellPrice(detailsData.sell_price) || 'N/A'
-            };
-  
-            const imageData = await imageResponse.json();
-            const itemImage = imageData.assets[0]?.value || '';
 
-            const itemData = {
+            return {
               id: item.item.id,
               name: slotName,
-              image: itemImage,
-              details: itemDetails
+              image: mediaData.assets?.[0]?.value || '',
+              details: {
+                name: detailsData.name || slotName,
+                itemLevel: detailsData.level || 0,
+                transmog: item.is_transmogrified ? item.display?.slot?.type : 'None',
+                bind: detailsData.binding?.type === 'ON_PICKUP' ? 'Binds when picked up' : null,
+                type: detailsData.inventory_type?.type || 'Leather',
+                stats: detailsData.preview_item?.stats?.map(stat => ({
+                  name: stat.type.name,
+                  value: stat.value,
+                })) || [],
+                socket: detailsData.sockets ? 'Socket Available' : null,
+                requiredLevel: detailsData.required_level || 0,
+                sellPrice: this.formatSellPrice(detailsData.sell_price) || 'N/A',
+              },
             };
-  
-            // Divide items into groups
-            if (['Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Shirt', 'Tabard', 'Wrist'].includes(slotName)) {
-              armorPiecesTemp.push(itemData);
-            } else if (['Hands', 'Waist', 'Legs', 'Feet', 'Finger_1', 'Finger_2', 'Trinket_1', 'Trinket_2'].includes(slotName)) {
-              rightItemsTemp.push(itemData);
-            } else if (['Main_hand', 'Off_hand'].includes(slotName)) {
-              bottomIconsTemp.push(itemData);
-            }
+          } catch (error) {
+            console.error(`Error fetching item ${item.item.id}:`, error);
+            return null;
           }
-          
-          // Update equipment arrays
-          this.armorPieces = armorPiecesTemp;
-          this.rightItems = rightItemsTemp;
-          this.bottomIcons = bottomIconsTemp;
-          console.log(this.bottomIcons);
-          // Set default selections if available
-          if (this.armorPieces.length > 0) {
-            this.currentPiece = this.armorPieces[0];
-          }
-          if (this.rightItems.length > 0) {
-            this.currentRightItem = this.rightItems[0];
-          }
-          if (this.bottomIcons.length > 0) {
-            this.currentBottomIcons = this.bottomIcons[0];
-          }
-        } catch (error) {
-          console.error('Erro ao carregar equipamento:', error);
-        } finally {
-          this.isLoading = false;
-        }
-      },
-      formatSellPrice(price) {
-        if (!price) return null;
-        const gold = Math.floor(price / 10000);
-        const silver = Math.floor((price % 10000) / 100);
-        const copper = price % 100;
-        return `${gold} 🥇 ${silver} 🥈 ${copper} 🥉`;
-      },
+        });
+
+        const items = await Promise.all(itemPromises);
+        const validItems = items.filter(Boolean);
+
+        this.armorPieces = validItems.filter(i => ['Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Shirt', 'Tabard', 'Wrist'].includes(i.name));
+        this.rightItems = validItems.filter(i => ['Hands', 'Waist', 'Legs', 'Feet', 'Finger_1', 'Finger_2', 'Trinket_1', 'Trinket_2'].includes(i.name));
+        this.bottomIcons = validItems.filter(i => ['Main_hand', 'Off_hand'].includes(i.name));
+
+        if (this.armorPieces.length) this.currentPiece = this.armorPieces[0];
+        if (this.rightItems.length) this.currentRightItem = this.rightItems[0];
+        if (this.bottomIcons.length) this.currentBottomIcons = this.bottomIcons[0];
+      } catch (error) {
+        console.error('Error loading equipment:', error);
+      } finally {
+        this.isLoading = false;
+      }
     },
-    created() {
-      this.fetchEquipment();
+    formatSellPrice(price) {
+      if (!price) return 'N/A';
+      const gold = Math.floor(price / 10000);
+      const silver = Math.floor((price % 10000) / 100);
+      const copper = price % 100;
+      return `${gold} 🥇 ${silver} 🥈 ${copper} 🥉`;
     },
-  };
-  </script>
+  },
+  created() {
+    this.fetchEquipment();
+  },
+};
+</script>
   
-  <style scoped>
+<style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
 .modal-backdrop {
@@ -346,7 +283,13 @@
   color: #f4ecd8;
 }
 
-/* Loading spinner styles */
+.no-equipment {
+  text-align: center;
+  padding: 20px;
+  color: #f4ecd8;
+  font-size: 1.2rem;
+}
+
 .loading-container {
   position: relative;
   height: 400px;
@@ -355,9 +298,6 @@
   justify-content: center;
 }
 
-/* Existing styles remain unchanged */
-
-/* New style for the modal title */
 .modal-title {
   font-family: 'Cinzel', serif;
   color: #f4ecd8;
@@ -401,14 +341,16 @@
 }
 
 .thumbnail {
-  width: 80px;
-  height: 80px;
+  width: 60px; /* Para side-panel e bottom-icons */
+  height: 60px;
   border: 2px solid #020100;
   margin: 10px;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative; /* Necessário para o tooltip */
+  z-index: 1001; /* Um nível acima de bottom-icons, mas abaixo do tooltip */
 }
 
 .thumbnail img {
@@ -423,9 +365,15 @@
   box-shadow: 0 4px 20px rgba(236, 168, 8, 0.15);
 }
 
-/* Removed .thumbnail.selected styling */
+.bottom-icons .thumbnail {
+  width: 40px; /* Tamanho menor conforme o design */
+  height: 40px;
+  margin: 0 8px;
+  border: 2px solid #8b6d5c; /* Estilo específico dos ícones */
+}
 
 .central-display {
+  z-index: -1;
   width: 60%;
   display: flex;
   justify-content: center;
@@ -443,36 +391,13 @@
 
 .bottom-icons {
   position: absolute;
-  bottom: 10px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   justify-content: center;
+  z-index: 1000; /* Define o contexto de empilhamento para bottom-icons */
 }
-
-.icon {
-  width: 50px;
-  height: 50px;
-  margin: 0 10px;
-  border: 2px solid #8b6d5c;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.icon:hover {
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 4px 20px rgba(201, 179, 127, 0.15);
-}
-
-/* Removed .icon.selected styling */
 
 .close-btn {
   position: absolute;
@@ -497,7 +422,6 @@
   box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
 }
 
-/* Modal transition */
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.5s ease;
@@ -508,28 +432,49 @@
   opacity: 0;
 }
 
+/* Base tooltip styles */
 .tooltip {
-  position: relative;
   display: none;
-}
-
-.thumbnail:hover .tooltip {
-  display: block;
   position: absolute;
-  z-index: 1001;
-  background: rgba(255, 255, 255, 0.08);
+  z-index: 9999;
+  background: rgba(122, 108, 108, 0.826);
   backdrop-filter: blur(8px) saturate(180%);
   -webkit-backdrop-filter: blur(8px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.493);
   border-radius: 8px;
   padding: 10px;
   width: 250px;
   color: #f4ecd8;
   font-family: 'Cinzel', serif;
   box-shadow: 0 4px 15px rgba(31, 38, 135, 0.37);
-  top: -120px;
+}
+
+
+/* Tooltip para itens da esquerda (abre para a direita) */
+.side-panel.left .thumbnail:hover .tooltip {
+  display: block;
+  top: 50%;
+  left: 100%; /* Posiciona à direita do thumbnail */
+  transform: translateY(-50%); /* Centraliza verticalmente */
+  margin-left: 10px; /* Espaço entre o thumbnail e o tooltip */
+}
+
+/* Tooltip para itens da direita (abre para a esquerda) */
+.side-panel.right .thumbnail:hover .tooltip {
+  display: block;
+  top: 50%;
+  right: 100%; /* Posiciona à esquerda do thumbnail */
+  transform: translateY(-50%); /* Centraliza verticalmente */
+  margin-right: 10px; /* Espaço entre o thumbnail e o tooltip */
+}
+
+/* Tooltip para itens de baixo (abre acima) */
+.bottom-icons .thumbnail:hover .tooltip {
+  display: block;
+  bottom: 100%; /* Posiciona acima do thumbnail */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%); /* Centraliza horizontalmente */
+  margin-bottom: 10px; /* Espaço entre o thumbnail e o tooltip */
 }
 
 .tooltip-content {
@@ -542,7 +487,8 @@
   color: #ffffff;
 }
 
-.tooltip-content p, .tooltip-content ul {
+.tooltip-content p,
+.tooltip-content ul {
   margin: 5px 0;
   font-size: 0.9rem;
 }
@@ -557,7 +503,7 @@
 }
 
 .tooltip-content li span.green {
-  color: #00ff00; 
+  color: #00ff00;
 }
 </style>
   
