@@ -105,7 +105,7 @@ export default {
         'gilneas', 'gnomeregan', 'goldrinn', 'gorefiend', 'gorgonnash', 'greymane', 
         'grizzly hills', "gul'dan", 'gundrak', 'gurubashi', 'hakkar', 'haomarush', 'hellscream', 
         'hydraxis', 'hyjal', 'icecrown', 'illidan', 'jaedenar', "jubei'thos", "kael'thas", 
-        'kalecgos', 'kargath', "kel'thuzad", 'khadgar', 'khaz modan', "khaz'goroth", 
+        'kalecgos', 'kargath', "kel'thuzad", 'khadgar', 'khaz-modan', "khaz'goroth", 
         "kil'jaeden", 'kilrogg', 'kirin tor', 'korgath', 'korialstrasz', 'kul tiras', 
         'laughing skull', 'lethon', 'lightbringer', "lightning's blade", 'lightninghoof', 
         'llane', 'lothar', 'madoran', 'maelstrom', 'magtheridon', 'maiev', "mal'ganis", 
@@ -129,7 +129,8 @@ export default {
       ],
       filteredReigns: [],
       isMuted: true,
-      highlightedIndex: -1
+      highlightedIndex: -1,
+      submitted: false
     };
   },
   mounted() {
@@ -205,7 +206,6 @@ export default {
 
       try {
         const token = process.env.VUE_APP_WOW_TOKEN;
-        console.log(token);
         const response = await axios.get(
           `https://us.api.blizzard.com/profile/wow/character/${this.reign}/${this.username}/character-media?namespace=profile-us`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -220,6 +220,7 @@ export default {
           query: {
             name: characterName,
             realm: characterRealm,
+            realmPath: this.reign,
             image: characterImage,
           }
         });
@@ -227,9 +228,11 @@ export default {
         this.username = "";
         this.reign = "";
         this.searchTerm = "";
+        this.submitted = false;
       } catch (error) {
         console.error("Erro ao buscar personagem:", error);
         alert("Erro ao buscar personagem");
+        this.submitted = false;
       }
     }
   }

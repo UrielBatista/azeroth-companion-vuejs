@@ -40,13 +40,26 @@
         </div>
       </div>
 
-      <!-- Container de Pvp -->
+      <!-- Etapa de PvP -->
       <div class="stats-container">
-        <div v-if="!stats" class="loading-spinner"></div>
+        <div v-if="!pvp2s" class="loading-spinner"></div>
         <div v-else>
-          <h3>Pvp (WIP)</h3>
-          <ul class="stats-grid">
-            <li></li>
+          <h3>Pvp</h3>
+          <ul class="pvp-grid">
+            <li class="pvp-item">
+              <img :src="getBrasaoImage(pvp2s.rating)" class="pvp-icon" />
+              <div class="pvp-value">{{ pvp2s.rating }}</div>
+              <div class="pvp-label">Wins: {{ pvp2s.season_match_statistics.won }}</div>
+              <div class="pvp-label">Lost: {{ pvp2s.season_match_statistics.lost }}</div>
+              <div class="pvp-label">Played: {{ pvp2s.season_match_statistics.played }}</div>
+            </li>
+            <li class="pvp-item">
+              <img :src="getBrasaoImage(pvp3s.rating)" class="pvp-icon" />
+              <div class="pvp-value">{{ pvp3s.rating }}</div>
+              <div class="pvp-label">Wins: {{ pvp3s.season_match_statistics.won }}</div>
+              <div class="pvp-label">Lost: {{ pvp3s.season_match_statistics.lost }}</div>
+              <div class="pvp-label">Played: {{ pvp3s.season_match_statistics.played }}</div>
+            </li>
           </ul>
         </div>
       </div>
@@ -98,6 +111,15 @@ import warlockBackground from '@/assets/warlock-background.webp';
 import warriorBackground from '@/assets/warrior-background.webp';
 import shamanBackground from '@/assets/xama-background.webp';
 
+// Importação das imagens de brasão
+import arena01299 from '@/assets/arena-0-1299.png';
+import arena13001499 from '@/assets/arena-1300-1499.png';
+import arena15001799 from '@/assets/arena-1500-1799.png';
+import arena18001950 from '@/assets/arena-1800-1950.png';
+import arena19512100 from '@/assets/arena-1951-2100.png';
+import arena21012250 from '@/assets/arena-2101-2250.png';
+import arena22515000 from '@/assets/arena-2251-5000.png';
+
 export default {
   name: 'CharacterProfile',
   components: {
@@ -118,8 +140,11 @@ export default {
       },
       name: this.$route.query.name || 'Unknown',
       realm: this.$route.query.realm || 'Unknown',
+      realmPath: this.$route.query.realmPath || 'Unknow',
       imageArmor: this.$route.query.image || '',
       stats: null,
+      pvp2s: null,
+      pvp3s: null,
       imageLoaded: false,
       showArmorModal: false,
       statIcons: {
@@ -132,7 +157,6 @@ export default {
         mastery: require('@/assets/icons/mastery.svg'),
         versatility: require('@/assets/icons/versatility.svg'),
       },
-      // Mapeamento das classes para os arquivos .webp importados
       classBackgrounds: {
         'Death Knight': deathknightBackground,
         'Demon Hunter': demonhunterBackground,
@@ -148,6 +172,16 @@ export default {
         'Warrior': warriorBackground,
         'Shaman': shamanBackground,
       },
+      // Mapeamento de faixas de rating para imagens de brasão
+      brasaoImages: [
+        { min: 0, max: 1299, image: arena01299 },
+        { min: 1300, max: 1499, image: arena13001499 },
+        { min: 1500, max: 1799, image: arena15001799 },
+        { min: 1800, max: 1950, image: arena18001950 },
+        { min: 1951, max: 2100, image: arena19512100 },
+        { min: 2101, max: 2250, image: arena21012250 },
+        { min: 2251, max: 5000, image: arena22515000 },
+      ],
     };
   },
   computed: {
@@ -164,16 +198,16 @@ export default {
         { key: 'versatility', label: 'VERSATILITY', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
       ].filter(stat => stat.value !== undefined);
     },
-    // Propriedade computada para o background dinâmico
     backgroundImage() {
-      const classType = this.characterInfo.classtype || 'Rogue'; // Default para 'Rogue'
-      const background = this.classBackgrounds[classType] || this.classBackgrounds['Rogue']; // Fallback para Rogue
-      return background;
+      const classType = this.characterInfo.classtype || 'Rogue';
+      return this.classBackgrounds[classType] || this.classBackgrounds['Rogue'];
     },
   },
   mounted() {
     this.fetchCharacterData();
     this.fetchStats();
+    this.fetchPvPBracket();
+    // window.history.pushState({}, document.title, this.$route.path);
   },
   methods: {
     goBack() {
@@ -182,15 +216,13 @@ export default {
     async fetchCharacterData() {
       try {
         const token = process.env.VUE_APP_WOW_TOKEN;
-        const realmParam = this.realm.toLowerCase();
+        const realmParam = this.realmPath.toLowerCase();
         const nameParam = this.name.toLowerCase();
         const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}?namespace=profile-us&locale=en_US`;
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         this.updateCharacterData(response.data);
-
       } catch (error) {
         console.error('Erro ao buscar dados do personagem:', error);
         this.name = this.$route.query.name || 'Unknown';
@@ -201,17 +233,33 @@ export default {
     async fetchStats() {
       try {
         const token = process.env.VUE_APP_WOW_TOKEN;
-        const realmParam = this.realm.toLowerCase();
+        const realmParam = this.realmPath.toLowerCase();
         const nameParam = this.name.toLowerCase();
         const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/statistics?namespace=profile-us&locale=en_US`;
-
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         this.stats = response.data;
       } catch (error) {
         console.error('Erro ao buscar estatísticas:', error);
+      }
+    },
+    async fetchPvPBracket() {
+      const token = process.env.VUE_APP_WOW_TOKEN;
+      const realmParam = this.realmPath.toLowerCase();
+      const nameParam = this.name.toLowerCase();
+      const pvp2s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/2v2?namespace=profile-us&locale=en_US`;
+      const pvp3s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/3v3?namespace=profile-us&locale=en_US`;
+
+      try {
+        const [response2s, response3s] = await Promise.all([
+          axios.get(pvp2s, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(pvp3s, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        this.pvp2s = response2s.data;
+        this.pvp3s = response3s.data;
+      } catch (error) {
+        console.error('Erro ao buscar estatísticas PvP:', error);
       }
     },
     updateCharacterData(data) {
@@ -230,17 +278,23 @@ export default {
     openArmorModal() {
       this.showArmorModal = true;
     },
+    // Função para mapear o rating para a imagem de brasão
+    getBrasaoImage(rating) {
+      for (const brasao of this.brasaoImages) {
+        if (rating >= brasao.min && rating <= brasao.max) {
+          return brasao.image;
+        }
+      }
+      return arena01299; // Imagem padrão para ratings fora das faixas
+    },
   },
 };
 </script>
 
 <style scoped>
-/* Existing styles remain unchanged */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
-/* ================================
-   WRAPPER GERAL 
-   ================================ */
+/* Estilos existentes permanecem inalterados até a seção de PvP */
 .profile-wrapper {
   position: relative;
   width: 100%;
@@ -252,7 +306,6 @@ export default {
   justify-content: center;
 }
 
-/* Vídeo de fundo */
 .background-video {
   position: absolute;
   top: 50%;
@@ -264,7 +317,6 @@ export default {
   z-index: -2;
 }
 
-/* Overlay */
 .overlay {
   position: absolute;
   top: 0;
@@ -275,9 +327,6 @@ export default {
   z-index: -1;
 }
 
-/* ================================
-   CONTAINER PRINCIPAL (GLASS) 
-   ================================ */
 .profile-container {
   position: relative;
   z-index: 1;
@@ -299,23 +348,13 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* TÍTULO E SUBTÍTULO */
 h1 {
   font-size: clamp(2rem, 5vw, 3.5rem);
   color: #c9b37f;
   margin-bottom: 0.5rem;
   text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
-h2 {
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  color: #bda65b;
-  margin-bottom: 2rem;
-  text-shadow: 0 0 8px rgba(189, 166, 91, 0.3);
-}
 
-/* ================================
-   CONTAINER DA IMAGEM 
-   ================================ */
 .image-container::before {
   content: '';
   position: absolute;
@@ -323,12 +362,12 @@ h2 {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: var(--background-image); /* Usa a variável CSS definida no v-bind */
+  background-image: var(--background-image);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(6px); /* Aplica o desfoque apenas ao fundo */
-  z-index: -1; /* Coloca o fundo atrás da imagem */
+  filter: blur(6px);
+  z-index: -1;
 }
 
 .image-container {
@@ -357,14 +396,11 @@ h2 {
   height: 100%;
   object-fit: cover;
   image-rendering: crisp-edges;
-  filter: contrast(1.2) saturate(1.1); /* Mantém os filtros originais da imagem do personagem */
+  filter: contrast(1.2) saturate(1.1);
   position: relative;
-  z-index: 1; /* Garante que a imagem fique acima do fundo desfocado */
+  z-index: 1;
 }
 
-/* ================================
-   ÁREA DE ESTATÍSTICAS 
-   ================================ */
 .stats-container {
   width: 90%;
   max-width: 800px;
@@ -385,7 +421,6 @@ h2 {
   text-align: center;
 }
 
-/* Layout em grid para as estatísticas */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -395,24 +430,33 @@ h2 {
   margin: 0 auto;
 }
 
-/* Responsividade do grid */
+.pvp-grid {
+  display: grid;
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  align-items: center;
+}
+
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Cartão individual de cada stat */
 .stat-item {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -421,11 +465,73 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .stat-item:hover {
   transform: translateY(-5px) scale(1.03);
   box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+}
+
+/* Estilização aprimorada para os itens de PvP */
+.pvp-item {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.pvp-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('@/assets/pvp-wallpaper.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.pvp-item:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+}
+
+.pvp-icon {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+  z-index: 1;
+}
+
+.pvp-value, .pvp-label {
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+.pvp-value {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.pvp-label {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
 }
 
 .stat-value {
@@ -460,7 +566,6 @@ h2 {
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Classes para colorir cada stat */
 .stat-health { color: #27cc4e; border-color: #27cc4e; }
 .stat-power { color: #cb9501; border-color: #cb9501; }
 .stat-stamina { color: #ff8b2d; border-color: #ff8b2d; }
@@ -471,10 +576,7 @@ h2 {
 .stat-mastery { color: #9256ff; border-color: #9256ff; }
 .stat-versatility { color: #bfbfbf; border-color: #bfbfbf; }
 
-/* ================================
-   BOTÃO DE VOLTAR E ARMOR 
-   ================================ */
-.btn-back, .btn-armor {
+.btn-back {
   margin-top: 2rem;
   padding: 0.8rem 2rem;
   font-size: 1.2rem;
@@ -490,12 +592,11 @@ h2 {
   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
 }
 
-.btn-back:hover, .btn-armor:hover {
+.btn-back:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
 }
 
-/* Responsividade extra */
 @media (max-width: 768px) {
   .image-container {
     width: 90%;
@@ -506,45 +607,16 @@ h2 {
     margin-top: 1.5rem;
     padding: 1.5rem;
   }
-  .btn-back, .btn-armor {
+  .btn-back {
     font-size: 1rem;
     padding: 0.6rem 1.5rem;
   }
 }
 
-.stat-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-}
-
 .stat-icon {
   display: block;
-  margin-left: 10% auto 1vw auto; /* centers horizontally, with bottom margin */
+  margin: 0 auto 1vw auto;
   width: 4vw;
   height: 4vw;
-}
-
-.stat-value {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.9;
 }
 </style>

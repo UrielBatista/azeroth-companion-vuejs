@@ -22,10 +22,10 @@
             <div class="tooltip" v-if="item.details">
               <div class="tooltip-content">
                 <h3>{{ item.details.name }}</h3>
+                <p>{{ item.details.type }}</p>
                 <p>Item Level: {{ item.details.itemLevel }}</p>
                 <p>Transmogrified to: {{ item.details.transmog || 'None' }}</p>
                 <p v-if="item.details.bind">Binds: {{ item.details.bind }}</p>
-                <p>{{ item.details.type }}</p>
                 <ul>
                   <li v-for="stat in item.details.stats" :key="stat.name">
                     +{{ stat.value }} {{ stat.name }}
@@ -55,10 +55,10 @@
             <div class="tooltip" v-if="item.details">
               <div class="tooltip-content">
                 <h3>{{ item.details.name }}</h3>
+                <p>{{ item.details.type }}</p>
                 <p>Item Level: {{ item.details.itemLevel }}</p>
                 <p>Transmogrified to: {{ item.details.transmog || 'None' }}</p>
                 <p v-if="item.details.bind">Binds: {{ item.details.bind }}</p>
-                <p>{{ item.details.type }}</p>
                 <ul>
                   <li v-for="stat in item.details.stats" :key="stat.name">
                     +{{ stat.value }} {{ stat.name }}
@@ -84,10 +84,10 @@
             <div class="tooltip" v-if="icon.details">
               <div class="tooltip-content">
                 <h3>{{ icon.details.name }}</h3>
+                <p>{{ icon.details.type }}</p>
                 <p>Item Level: {{ icon.details.itemLevel }}</p>
                 <p>Transmogrified to: {{ icon.details.transmog || 'None' }}</p>
                 <p v-if="icon.details.bind">Binds: {{ icon.details.bind }}</p>
-                <p>{{ icon.details.type }}</p>
                 <ul>
                   <li v-for="stat in icon.details.stats" :key="stat.name">
                     +{{ stat.value }} {{ stat.name }}
@@ -185,7 +185,7 @@ export default {
         const itemPromises = equipment.map(async item => {
           const slotName = slotMapping[item.slot.type];
           if (!slotName) return null;
-
+          
           const mediaUrl = `https://us.api.blizzard.com/data/wow/media/item/${item.item.id}?namespace=static-us&locale=en_US`;
           const detailsUrl = `https://us.api.blizzard.com/data/wow/item/${item.item.id}?namespace=static-us&locale=en_US`;
 
@@ -199,7 +199,7 @@ export default {
 
             const mediaData = await mediaResponse.json();
             const detailsData = await detailsResponse.json();
-
+            
             return {
               id: item.item.id,
               name: slotName,
@@ -207,7 +207,7 @@ export default {
               details: {
                 name: detailsData.name || slotName,
                 itemLevel: detailsData.level || 0,
-                transmog: item.is_transmogrified ? item.display?.slot?.type : 'None',
+                transmog: item?.transmog?.item?.name ? item?.transmog?.item?.name : 'None',
                 bind: detailsData.binding?.type === 'ON_PICKUP' ? 'Binds when picked up' : null,
                 type: detailsData.inventory_type?.type || 'Leather',
                 stats: detailsData.preview_item?.stats?.map(stat => ({
