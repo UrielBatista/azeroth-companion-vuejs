@@ -61,13 +61,51 @@
       </div>
 
       <!-- In development AI -->
-      <div class="stats-container">
+      <div class="stats-container ai-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
-          <h3>Improvement your gameplay with IA (WIP)</h3>
-          <ul class="stats-grid">
-            <li></li>
-          </ul>
+          <h3>Improvement your gameplay with IA</h3>
+          <div class="ai-controls">
+            <div class="toggle-container">
+              <label class="toggle-label">Game Mode:</label>
+              <div class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  id="gameMode" 
+                  v-model="isPvE"
+                >
+                <label for="gameMode" class="toggle-slider">
+                  <span class="toggle-option toggle-pvp">PvP</span>
+                  <span class="toggle-option toggle-pve">PvE</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="checkbox-container">
+              <input 
+                type="checkbox" 
+                id="strategicRotation" 
+                v-model="searchStrategicRotation"
+              >
+              <label for="strategicRotation">Search Strategic Rotation</label>
+            </div>
+            <div class="btn-container">
+              <button @click="searchAI" class="btn-search-ai">Search</button>
+            </div>
+          </div>
+          <div class="ai-response-container">
+            <div class="ai-response" v-if="aiResponse">
+              <div class="ai-header">
+                <span class="ai-title">AI Analysis</span>
+              </div>
+              <div class="ai-content" v-html="formattedResponse">
+              </div>
+              <!-- <button @click="clearAI" class="btn-clear-ai">Clear</button> -->
+            </div>
+            <div class="ai-placeholder" v-else>
+              Select options above to get AI recommendations
+            </div>
+          </div>
         </div>
       </div>
 
@@ -78,10 +116,11 @@
         :name="name"
         :realm="realm"
         :averageIlvl="characterInfo.averageIlvl"
+        :equipaments="equipaments"
         @close="showArmorModal = false" 
       />
 
-      <button @click="goBack" class="btn-back">Exit</button>
+      <!-- <button @click="goBack" class="btn-back">Exit</button> -->
     </div>
   </div>
 </template>
@@ -131,15 +170,20 @@ export default {
         guild: '',
         lastLogin: null
       },
+      formattedResponse: '',
       name: this.$route.query.name || 'Unknown',
       realm: this.$route.query.realm || 'Unknown',
       realmPath: this.$route.query.realmPath || 'Unknow',
       imageArmor: this.$route.query.image || '',
+      equipaments: null,
       stats: null,
       pvp2s: null,
       pvp3s: null,
       imageLoaded: false,
       showArmorModal: false,
+      isPvE: false,
+      searchStrategicRotation: false,
+      aiResponse: null,
       statIcons: {
         health: require('@/assets/icons/health.svg'),
         power: require('@/assets/icons/energy.svg'),
@@ -198,6 +242,7 @@ export default {
   },
   mounted() {
     this.fetchCharacterData();
+    this.fetchEquipaments();
     this.fetchStats();
     this.fetchPvPBracket();
     // window.history.pushState({}, document.title, this.$route.path);
@@ -205,6 +250,63 @@ export default {
   methods: {
     goBack() {
       this.$router.push({ name: 'SearchCharacter' });
+    },
+    formatResponse() {
+      // Formatação básica: converte quebras de linha em <br> e aplica negrito em títulos simulados
+      let formatted = this.aiResponse
+        .replace(/\n/g, '<br>') // Quebras de linha
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Negrito com **texto**
+
+      // Exemplo: detectar "títulos" simples (linhas que começam com # ou ##) e formatar
+      formatted = formatted
+        .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+        .replace(/^## (.*)$/gm, '<h2>$1</h2>');
+
+      this.formattedResponse = formatted;
+    },
+    async fetchEquipaments() {
+        const token = process.env.VUE_APP_AI_TOKEN;
+        const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
+        const responseEquipments = await apiFetch(equipmentUrl);
+        
+        if (!responseEquipments.ok) throw new Error('Failed to fetch equipment');
+        
+        const data = await responseEquipments.json();
+        
+        this.equipaments = data;
+    },
+    async updateAIMode() {
+      const mode = this.isPvE ? 'PvE' : 'PvP';
+      const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
+
+      const tokenAi = process.env.VUE_APP_AI_TOKEN;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
+
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
+              do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
+              ${JSON.stringify(this.equipaments)}`
+          }]
+        }]
+      };
+
+      const responseAi = await axios.post(url, requestBody, {
+          headers: { 'Content-Type': 'application/json' }
+      });
+      
+      this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      this.formatResponse();
+    },
+    searchAI() {
+      this.updateAIMode();
+    },
+    clearAI() {
+      this.aiResponse = null;
+      this.isPvE = false;
+      this.searchStrategicRotation = false;
     },
     async fetchCharacterData() {
       try {
@@ -270,6 +372,16 @@ export default {
     },
     openArmorModal() {
       this.showArmorModal = true;
+      let elevate = 0.8;
+      if (!this.aiResponse){
+        elevate = 0.9;
+      }
+      this.$nextTick(() => {
+        window.scrollTo({
+          top: window.innerHeight / elevate,
+          behavior: 'smooth'
+        });
+      });
     },
     getBrasaoImage(rating) {
       for (const brasao of this.brasaoImages) {
@@ -446,6 +558,218 @@ h1 {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* IA Container */
+.ai-container {
+  margin-bottom: 2rem;
+}
+
+.ai-controls {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-label {
+  color: #c9b37f;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 34px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.05);
+  transition: 0.4s;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.toggle-option {
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-pvp { color: #e01c1c; }
+.toggle-pve { color: #0ed59b; }
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 50%;
+  left: 0.1px;
+  background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
+  transition: 0.4s;
+  border-radius: 34px;
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(100%);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-container input {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checkbox-container input:checked {
+  background: #c9b37f;
+  border-color: #c9b37f;
+  position: relative;
+}
+
+.checkbox-container input:checked:after {
+  content: '✓';
+  position: absolute;
+  color: #000;
+  font-size: 14px;
+  left: 4px;
+  bottom: 0.1px;
+}
+
+.checkbox-container label {
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.ai-response-container {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-response {
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+}
+
+.ai-header {
+  background: linear-gradient(135deg, rgba(201, 179, 127, 0.2), rgba(189, 166, 91, 0.2));
+  padding: 0.5rem 1rem;
+  border-radius: 6px 6px 0 0;
+  margin-bottom: 0.5rem;
+}
+
+.ai-title {
+  color: #c9b37f;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.ai-content {
+  padding: 0.5rem;
+  line-height: 1.5;
+  flex-grow: 1; /* Permite que o conteúdo se expanda */
+  overflow-y: auto; /* Adiciona rolagem vertical se necessário */
+  max-height: 300px; /* Define uma altura máxima opcional */
+}
+
+.ai-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.btn-container {
+  margin-top: 10px;
+  margin-bottom: -20px;
+}
+
+.btn-search-ai {
+  display: block;
+  margin: 0 auto 1rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+  font-family: 'Cinzel', serif;
+}
+
+.btn-search-ai:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+}
+
+.btn-clear-ai {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+  font-family: 'Cinzel', serif;
+}
+
+.btn-clear-ai:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
 }
 
 .stat-item {

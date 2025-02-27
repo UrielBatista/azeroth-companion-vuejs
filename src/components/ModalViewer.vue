@@ -1,4 +1,5 @@
 <template>
+  <transition name="fade">
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal" :style="{ '--background-image': `url(${backgroundImage})` }">
       <h2 class="modal-title">Armor level: {{ averageIlvl }}</h2>
@@ -103,6 +104,7 @@
       </div>
     </div>
   </div>
+</transition>
 </template>
   
 <script>
@@ -129,6 +131,10 @@ export default {
       type: Number,
       required: true,
       default: 0,
+    },
+    equipaments: {
+      type: Object,
+      required: true,
     }
   },
   data() {
@@ -166,13 +172,8 @@ export default {
       const token = process.env.VUE_APP_WOW_TOKEN;
       const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
       try {
-        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
-        const responseEquipments = await apiFetch(equipmentUrl);
-
-        if (!responseEquipments.ok) throw new Error('Failed to fetch equipment');
-
-        const data = await responseEquipments.json();
-        const equipment = data.equipped_items || [];
+        
+        const equipment = this.equipaments.equipped_items || [];
 
         const slotMapping = {
           'HEAD': 'Head', 'NECK': 'Neck', 'SHOULDER': 'Shoulder', 'BACK': 'Back',
@@ -283,10 +284,37 @@ export default {
   padding: 20px;
   width: 80%;
   max-width: 1000px;
-  position: relative;
+  position: fixed;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   font-family: 'Cinzel', serif;
   color: #f4ecd8;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -60%);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.modal-backdrop.fade-enter-active,
+.modal-backdrop.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.fade-enter-from,
+.modal-backdrop.fade-leave-to {
+  opacity: 0;
 }
 
 .no-equipment {
