@@ -188,10 +188,10 @@ export default {
     statList() {
       if (!this.stats) return [];
       return [
-        { key: 'health', label: 'HEALTH', value: this.stats.health },
-        { key: 'power', label: 'ENERGY', value: this.stats.power },
-        { key: 'stamina', label: 'STAMINA', value: this.stats.stamina?.effective },
-        { key: 'agility', label: 'AGILITY', value: this.stats.agility?.effective },
+        { key: 'health', label: 'HEALTH', value: this.stats.health.toLocaleString('pt-BR') },
+        { key: 'power', label: 'ENERGY', value: this.stats.power.toLocaleString('pt-BR') },
+        { key: 'stamina', label: 'STAMINA', value: this.stats.stamina?.effective.toLocaleString('pt-BR') },
+        { key: 'agility', label: 'AGILITY', value: this.stats.agility?.effective.toLocaleString('pt-BR') },
         { key: 'critical', label: 'CRITICAL STRIKE', value: this.stats.melee_crit?.value.toFixed(2) + ' %' },
         { key: 'haste', label: 'HASTE', value: this.stats.melee_haste?.value.toFixed(2) + ' %' },
         { key: 'mastery', label: 'MASTERY', value: this.stats.mastery?.value.toFixed(1) + ' %' },
