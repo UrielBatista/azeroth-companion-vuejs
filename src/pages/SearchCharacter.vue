@@ -6,19 +6,6 @@
       Seu navegador não suporta vídeos em HTML5.
     </video>
 
-    <!-- Áudio de fundo -->
-    <audio 
-      ref="bgMusic" 
-      autoplay 
-      loop 
-      style="opacity: 0; position: absolute; left: -9999px;"
-      :muted="isMuted"
-      @canplay="onAudioCanPlay"
-    >
-      <source src="/tavernLogin.mp3" type="audio/mpeg" />
-      Seu navegador não suporta áudio em HTML5.
-    </audio>
-
     <div class="login-container">
       <form @submit.prevent="handleLogin">
         <div class="input-group">
@@ -56,11 +43,6 @@
         <button type="submit" class="btn-login">Search</button>
       </form>
     </div>
-
-    <!-- Botão de Mute/Unmute -->
-    <button class="mute-btn" @click="toggleMute">
-      {{ isMuted ? 'Unmute' : 'Mute' }}
-    </button>
   </div>
 </template>
 
@@ -135,11 +117,6 @@ export default {
   },
   mounted() {
     this.filteredReigns = this.allReigns;
-    const audio = this.$refs.bgMusic;
-    audio.volume = 0.1;
-    audio.play().catch(err => {
-      console.warn("Autoplay bloqueado:", err);
-    });
   },
   methods: {
     toggleMute() {

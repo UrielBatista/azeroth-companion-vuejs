@@ -478,7 +478,6 @@ h1 {
 /* Estilização aprimorada para os itens de PvP */
 .pvp-item {
   position: relative;
-  background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   text-align: center;
