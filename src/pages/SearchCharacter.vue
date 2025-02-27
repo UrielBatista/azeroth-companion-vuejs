@@ -43,6 +43,11 @@
         <button type="submit" class="btn-login">Search</button>
       </form>
     </div>
+
+    <!-- Footer com a assinatura do desenvolvedor -->
+    <footer class="footer">
+      <a href="https://github.com/UrielBatista/azeroth-companion-vuejs" target="_blank" class="footer-link">Open Source Project</a>
+    </footer>
   </div>
 </template>
 
@@ -183,8 +188,10 @@ export default {
 
       try {
         const token = process.env.VUE_APP_WOW_TOKEN;
+        const searchUsername = this.username.trim().toLowerCase();
+        const searchReign = this.reign.trim().toLowerCase();
         const response = await axios.get(
-          `https://us.api.blizzard.com/profile/wow/character/${this.reign}/${this.username}/character-media?namespace=profile-us`,
+          `https://us.api.blizzard.com/profile/wow/character/${searchReign}/${searchUsername}/character-media?namespace=profile-us`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -401,6 +408,36 @@ html, body {
 .error {
   border-color: red !important;
   box-shadow: 0 0 10px red !important;
+}
+
+.footer {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1rem;
+  color: gold;
+  text-shadow: 2px 2px 4px rgba(255, 255, 0, 0.6);
+  z-index: 10; /* Garante que o footer fique acima de outros elementos */
+}
+
+.footer-link {
+  color: gold;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: #ffd700; /* Tom mais claro de dourado ao passar o mouse */
+}
+
+/* Ajuste para telas menores (responsividade) */
+@media (max-width: 480px) {
+  .footer {
+    font-size: 0.8rem;
+    bottom: 10px;
+  }
 }
 
 /* Responsividade */
