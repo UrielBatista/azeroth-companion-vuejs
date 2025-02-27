@@ -1,6 +1,5 @@
 <template>
   <div class="login-wrapper">
-    <!-- Vídeo de fundo -->
     <video autoplay loop muted playsinline class="background-video">
       <source src="@/assets/loginPage.mp4" type="video/mp4" />
       Seu navegador não suporta vídeos em HTML5.
@@ -12,7 +11,7 @@
           <label for="username">Character Name</label>
           <input type="text" id="username" v-model="username" :class="{ 'error': !username.trim() && submitted }" required />
         </div>
-        <!-- Select personalizado para 'reign' -->
+
         <div class="input-group reign-select">
           <label for="reign-search">Reign</label>
           <input 
@@ -44,7 +43,6 @@
       </form>
     </div>
 
-    <!-- Footer com a assinatura do desenvolvedor -->
     <footer class="footer">
       <a href="https://github.com/UrielBatista/azeroth-companion-vuejs" target="_blank" class="footer-link">Open Source Project</a>
     </footer>
@@ -326,7 +324,6 @@ html, body {
   transform: scale(1);
 }
 
-/* Botão de mute/unmute */
 .mute-btn {
   position: fixed;
   bottom: 20px;
@@ -419,7 +416,7 @@ html, body {
   font-size: 1rem;
   color: gold;
   text-shadow: 2px 2px 4px rgba(255, 255, 0, 0.6);
-  z-index: 10; /* Garante que o footer fique acima de outros elementos */
+  z-index: 10;
 }
 
 .footer-link {
@@ -429,10 +426,9 @@ html, body {
 }
 
 .footer-link:hover {
-  color: #ffd700; /* Tom mais claro de dourado ao passar o mouse */
+  color: #ffd700;
 }
 
-/* Ajuste para telas menores (responsividade) */
 @media (max-width: 480px) {
   .footer {
     font-size: 0.8rem;
@@ -440,7 +436,6 @@ html, body {
   }
 }
 
-/* Responsividade */
 @media (max-width: 480px) {
   .login-container {
     width: 90%;

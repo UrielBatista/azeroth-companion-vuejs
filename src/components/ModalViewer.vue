@@ -347,7 +347,7 @@ export default {
 }
 
 .thumbnail {
-  width: 60px; /* Para side-panel e bottom-icons */
+  width: 60px;
   height: 60px;
   border: 2px solid #020100;
   margin: 10px;
@@ -355,8 +355,8 @@ export default {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative; /* Necessário para o tooltip */
-  z-index: 1001; /* Um nível acima de bottom-icons, mas abaixo do tooltip */
+  position: relative;
+  z-index: 1001;
 }
 
 .thumbnail img {
@@ -372,10 +372,10 @@ export default {
 }
 
 .bottom-icons .thumbnail {
-  width: 40px; /* Tamanho menor conforme o design */
+  width: 40px;
   height: 40px;
   margin: 0 8px;
-  border: 2px solid #8b6d5c; /* Estilo específico dos ícones */
+  border: 2px solid #8b6d5c;
 }
 
 .central-display {
@@ -402,7 +402,7 @@ export default {
   transform: translateX(-50%);
   display: flex;
   justify-content: center;
-  z-index: 1000; /* Define o contexto de empilhamento para bottom-icons */
+  z-index: 1000;
 }
 
 .close-btn {
@@ -438,7 +438,6 @@ export default {
   opacity: 0;
 }
 
-/* Base tooltip styles */
 .tooltip {
   display: none;
   position: absolute;
@@ -456,31 +455,28 @@ export default {
 }
 
 
-/* Tooltip para itens da esquerda (abre para a direita) */
 .side-panel.left .thumbnail:hover .tooltip {
   display: block;
   top: 50%;
-  left: 100%; /* Posiciona à direita do thumbnail */
-  transform: translateY(-50%); /* Centraliza verticalmente */
-  margin-left: 10px; /* Espaço entre o thumbnail e o tooltip */
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 10px;
 }
 
-/* Tooltip para itens da direita (abre para a esquerda) */
 .side-panel.right .thumbnail:hover .tooltip {
   display: block;
   top: 50%;
-  right: 100%; /* Posiciona à esquerda do thumbnail */
-  transform: translateY(-50%); /* Centraliza verticalmente */
-  margin-right: 10px; /* Espaço entre o thumbnail e o tooltip */
+  right: 100%;
+  transform: translateY(-50%);
+  margin-right: 10px;
 }
 
-/* Tooltip para itens de baixo (abre acima) */
 .bottom-icons .thumbnail:hover .tooltip {
   display: block;
-  bottom: 100%; /* Posiciona acima do thumbnail */
+  bottom: 100%;
   left: 50%;
-  transform: translateX(-50%); /* Centraliza horizontalmente */
-  margin-bottom: 10px; /* Espaço entre o thumbnail e o tooltip */
+  transform: translateX(-50%);
+  margin-bottom: 10px;
 }
 
 .tooltip-content {

@@ -1,12 +1,10 @@
 <template>
   <div class="profile-wrapper">
-    <!-- Vídeo de fundo -->
     <video autoplay loop muted playsinline class="background-video">
       <source src="@/assets/CharacterScreen.mp4" type="video/mp4" />
       Seu navegador não suporta vídeos em HTML5.
     </video>
 
-    <!-- Overlay de gradiente -->
     <div class="overlay"></div>
 
     <div class="profile-container">
@@ -25,7 +23,6 @@
         />
       </div>
 
-      <!-- Container de Estatísticas -->
       <div class="stats-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
@@ -40,7 +37,6 @@
         </div>
       </div>
 
-      <!-- Etapa de PvP -->
       <div class="stats-container">
         <div v-if="!pvp2s" class="loading-spinner"></div>
         <div v-else>
@@ -64,7 +60,7 @@
         </div>
       </div>
 
-      <!-- Container de IA -->
+      <!-- In development AI -->
       <div class="stats-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
@@ -75,7 +71,6 @@
         </div>
       </div>
 
-      <!-- Armor Modal Component -->
       <armor-modal 
         v-if="showArmorModal" 
         :character-image="imageArmor"
@@ -96,7 +91,6 @@ import axios from 'axios';
 import ArmorModal from '../components/ModalViewer.vue';
 import CharacterDetails from '../components/CharacterDetails.vue';
 
-// Importação explícita dos arquivos .webp
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
 import dragonBackground from '@/assets/dragon-background.webp';
@@ -111,7 +105,6 @@ import warlockBackground from '@/assets/warlock-background.webp';
 import warriorBackground from '@/assets/warrior-background.webp';
 import shamanBackground from '@/assets/xama-background.webp';
 
-// Importação das imagens de brasão
 import arena01299 from '@/assets/arena-0-1299.png';
 import arena13001499 from '@/assets/arena-1300-1499.png';
 import arena15001799 from '@/assets/arena-1500-1799.png';
@@ -172,7 +165,7 @@ export default {
         'Warrior': warriorBackground,
         'Shaman': shamanBackground,
       },
-      // Mapeamento de faixas de rating para imagens de brasão
+      
       brasaoImages: [
         { min: 0, max: 1299, image: arena01299 },
         { min: 1300, max: 1499, image: arena13001499 },
@@ -278,14 +271,13 @@ export default {
     openArmorModal() {
       this.showArmorModal = true;
     },
-    // Função para mapear o rating para a imagem de brasão
     getBrasaoImage(rating) {
       for (const brasao of this.brasaoImages) {
         if (rating >= brasao.min && rating <= brasao.max) {
           return brasao.image;
         }
       }
-      return arena01299; // Imagem padrão para ratings fora das faixas
+      return arena01299;
     },
   },
 };
@@ -294,7 +286,6 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
-/* Estilos existentes permanecem inalterados até a seção de PvP */
 .profile-wrapper {
   position: relative;
   width: 100%;
@@ -475,7 +466,6 @@ h1 {
   box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
 }
 
-/* Estilização aprimorada para os itens de PvP */
 .pvp-item {
   position: relative;
   border-radius: 8px;

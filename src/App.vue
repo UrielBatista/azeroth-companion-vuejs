@@ -1,6 +1,5 @@
 <template>
   <div class="app-wrapper">
-    <!-- Áudio de fundo -->
     <audio 
       ref="bgMusic" 
       autoplay 
@@ -13,12 +12,10 @@
       Seu navegador não suporta áudio em HTML5.
     </audio>
 
-    <!-- Botão de Mute/Unmute -->
     <button class="mute-btn" @click="toggleMute">
       {{ isMuted ? 'Unmute' : 'Mute' }}
     </button>
 
-    <!-- Conteúdo da aplicação -->
     <router-view />
   </div>
 </template>
@@ -46,7 +43,6 @@ export default {
       }
     },
     onAudioCanPlay() {
-      // Pode ser usado para ações adicionais quando o áudio está pronto
     }
   }
 };
@@ -63,7 +59,6 @@ body {
   overflow: hidden;
 }
 
-/* Botão de mute/unmute */
 .mute-btn {
   position: fixed;
   bottom: 20px;
