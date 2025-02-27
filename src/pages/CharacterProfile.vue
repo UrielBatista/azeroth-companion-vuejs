@@ -89,18 +89,32 @@
               >
               <label for="strategicRotation">Search Strategic Rotation</label>
             </div>
+
             <div class="btn-container">
-              <button @click="searchAI" class="btn-search-ai">Search</button>
+              <button 
+                @click="searchAI" 
+                class="btn-search-ai" 
+                :disabled="isSearchDisabled || isLoadingAi"
+              >
+                Search
+              </button>
+              <div v-if="isSearchDisabled" class="cooldown-timer">
+                Next search in: {{ formattedRemainingTime }}
+              </div>
             </div>
+
           </div>
           <div class="ai-response-container">
-            <div class="ai-response" v-if="aiResponse">
+            <div class="ai-response" v-if="isLoadingAi || aiResponse">
               <div class="ai-header">
                 <span class="ai-title">AI Analysis</span>
               </div>
-              <div class="ai-content" v-html="formattedResponse">
+              <div class="ai-content">
+                <div v-if="isLoadingAi" class="loading-gif">
+                  <img src="https://media.giphy.com/media/vVnHvknWYdtQs/giphy.gif" alt="Loading data ai..." />
+                </div>
+                <div v-else v-html="formattedResponse"></div>
               </div>
-              <!-- <button @click="clearAI" class="btn-clear-ai">Clear</button> -->
             </div>
             <div class="ai-placeholder" v-else>
               Select options above to get AI recommendations
@@ -120,7 +134,6 @@
         @close="showArmorModal = false" 
       />
 
-      <!-- <button @click="goBack" class="btn-back">Exit</button> -->
     </div>
   </div>
 </template>
@@ -180,6 +193,9 @@ export default {
       pvp2s: null,
       pvp3s: null,
       imageLoaded: false,
+      lastSearchTime: null, 
+      remainingTime: 0,
+      isLoadingAi: false,
       showArmorModal: false,
       isPvE: false,
       searchStrategicRotation: false,
@@ -239,6 +255,17 @@ export default {
       const classType = this.characterInfo.classtype || 'Rogue';
       return this.classBackgrounds[classType] || this.classBackgrounds['Rogue'];
     },
+    isSearchDisabled() {
+      if (!this.lastSearchTime) return false; 
+      const now = new Date().getTime();
+      const cooldownEnd = this.lastSearchTime + 5 * 60 * 1000;
+      return now < cooldownEnd; 
+    },
+    formattedRemainingTime() {
+      const minutes = Math.floor(this.remainingTime / 60);
+      const seconds = this.remainingTime % 60;
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`; // Ex: "4:32"
+    },
   },
   mounted() {
     this.fetchCharacterData();
@@ -246,18 +273,36 @@ export default {
     this.fetchStats();
     this.fetchPvPBracket();
     // window.history.pushState({}, document.title, this.$route.path);
+
+    const savedTime = localStorage.getItem('lastSearchTime');
+    if (savedTime) {
+      this.lastSearchTime = parseInt(savedTime);
+      this.updateCooldownTimer();
+    }
   },
   methods: {
+    updateCooldownTimer() {
+      if (!this.lastSearchTime) {
+        this.remainingTime = 0;
+        return;
+      }
+      const now = new Date().getTime();
+      const cooldownEnd = this.lastSearchTime + 5 * 60 * 1000; 
+      const timeLeft = Math.max(0, Math.floor((cooldownEnd - now) / 1000)); 
+      this.remainingTime = timeLeft;
+
+      if (timeLeft > 0) {
+        setTimeout(this.updateCooldownTimer, 1000); 
+      }
+    },
     goBack() {
       this.$router.push({ name: 'SearchCharacter' });
     },
     formatResponse() {
-      // Formatação básica: converte quebras de linha em <br> e aplica negrito em títulos simulados
       let formatted = this.aiResponse
-        .replace(/\n/g, '<br>') // Quebras de linha
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Negrito com **texto**
+        .replace(/\n/g, '<br>') 
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
 
-      // Exemplo: detectar "títulos" simples (linhas que começam com # ou ##) e formatar
       formatted = formatted
         .replace(/^# (.*)$/gm, '<h1>$1</h1>')
         .replace(/^## (.*)$/gm, '<h2>$1</h2>');
@@ -265,7 +310,7 @@ export default {
       this.formattedResponse = formatted;
     },
     async fetchEquipaments() {
-        const token = process.env.VUE_APP_AI_TOKEN;
+        const token = process.env.VUE_APP_WOW_TOKEN;
         const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
         const responseEquipments = await apiFetch(equipmentUrl);
@@ -277,6 +322,13 @@ export default {
         this.equipaments = data;
     },
     async updateAIMode() {
+
+      if (this.isSearchDisabled) return;
+      this.lastSearchTime = new Date().getTime();
+      localStorage.setItem('lastSearchTime', this.lastSearchTime);
+      this.updateCooldownTimer();
+
+      this.isLoadingAi = true;
       const mode = this.isPvE ? 'PvE' : 'PvP';
       const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
 
@@ -296,9 +348,11 @@ export default {
       const responseAi = await axios.post(url, requestBody, {
           headers: { 'Content-Type': 'application/json' }
       });
+      // let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
       
       this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       this.formatResponse();
+      this.isLoadingAi = false;
     },
     searchAI() {
       this.updateAIMode();
@@ -451,6 +505,21 @@ export default {
   transition: all 0.3s ease;
 }
 
+.cooldown-timer {
+  margin-top: 0.5rem;
+  color: #c9b37f;
+  font-size: 1rem;
+  text-align: center;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+}
+
+.btn-search-ai:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
+}
+
 h1 {
   font-size: clamp(2rem, 5vw, 3.5rem);
   color: #c9b37f;
@@ -563,6 +632,18 @@ h1 {
 /* IA Container */
 .ai-container {
   margin-bottom: 2rem;
+}
+
+.loading-gif {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loading-gif img {
+  width: 50px;
+  height: 50px;
 }
 
 .ai-controls {
