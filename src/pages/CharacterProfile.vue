@@ -351,7 +351,6 @@ export default {
       
       // let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
       this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      this.aiResponse = responseAi;
       this.formatResponse();
       this.isLoadingAi = false;
     },
