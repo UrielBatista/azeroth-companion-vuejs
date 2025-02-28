@@ -1,28 +1,30 @@
 <template>
   <div class="profile-wrapper">
-    <video autoplay loop muted playsinline class="background-video">
-      <source src="@/assets/CharacterScreen.mp4" type="video/mp4" />
-      Seu navegador não suporta vídeos em HTML5.
-    </video>
+  <video autoplay loop muted playsinline class="background-video">
+    <source src="@/assets/CharacterScreen.mp4" type="video/mp4" />
+    Seu navegador não suporta vídeos em HTML5.
+  </video>
 
-    <div class="overlay"></div>
+  <div class="overlay"></div>
 
-    <div class="profile-container">
-      <div v-if="!stats" class="loading-spinner"></div>
-      <h1>{{ name }}-{{ realm }}</h1>
-      <character-details :details="characterInfo" />
+  <div class="profile-container">
+    <div v-if="!stats" class="loading-spinner"></div>
+    <h1>{{ name }}-{{ realm }}</h1>
+    <character-details :details="characterInfo" />
 
-      <div class="image-container" :style="{ '--background-image': `url(${backgroundImage})` }">
-        <div v-if="!imageLoaded" class="loading-spinner"></div>
-        <img 
-          :src="imageArmor" 
-          alt="Personagem" 
-          class="character-image"
-          @click="openArmorModal"
-          @load="imageLoaded = true"
-        />
-      </div>
+    <div class="image-container" :style="{ '--background-image': `url(${backgroundImage})` }">
+      <div v-if="!imageLoaded" class="loading-spinner"></div>
+      <img 
+        :src="imageArmor" 
+        alt="Personagem" 
+        class="character-image"
+        @click="openArmorModal"
+        @load="imageLoaded = true"
+      />
+    </div>
 
+    <!-- Novo wrapper para agrupar as seções -->
+    <div class="info-wrapper">
       <div class="stats-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
@@ -40,7 +42,7 @@
       <div class="stats-container">
         <div v-if="!pvp2s" class="loading-spinner"></div>
         <div v-else>
-          <h3>Pvp</h3>
+          <h3>PvP</h3>
           <ul class="pvp-grid">
             <li class="pvp-item">
               <img :src="getBrasaoImage(pvp2s.rating)" class="pvp-icon" />
@@ -60,7 +62,6 @@
         </div>
       </div>
 
-      <!-- In development AI -->
       <div class="stats-container ai-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
@@ -102,7 +103,6 @@
                 Next search in: {{ formattedRemainingTime }}
               </div>
             </div>
-
           </div>
           <div class="ai-response-container">
             <div class="ai-response" v-if="isLoadingAi || aiResponse">
@@ -122,20 +122,20 @@
           </div>
         </div>
       </div>
-
-      <armor-modal 
-        v-if="showArmorModal" 
-        :character-image="imageArmor"
-        :backgroundImage="backgroundImage"
-        :name="name"
-        :realm="realm"
-        :averageIlvl="characterInfo.averageIlvl"
-        :equipaments="equipaments"
-        @close="showArmorModal = false" 
-      />
-
     </div>
+
+    <armor-modal 
+      v-if="showArmorModal" 
+      :character-image="imageArmor"
+      :backgroundImage="backgroundImage"
+      :name="name"
+      :realm="realm"
+      :averageIlvl="characterInfo.averageIlvl"
+      :equipaments="equipaments"
+      @close="showArmorModal = false" 
+    />
   </div>
+</div>
 </template>
 
 <script>
@@ -436,9 +436,9 @@ export default {
     },
     openArmorModal() {
       this.showArmorModal = true;
-      let elevate = 0.8;
+      let elevate = 0.96;
       if (!this.aiResponse){
-        elevate = 0.9;
+        elevate = 0.95;
       }
       this.$nextTick(() => {
         window.scrollTo({
@@ -515,21 +515,6 @@ export default {
   transition: all 0.3s ease;
 }
 
-.cooldown-timer {
-  margin-top: 0.5rem;
-  color: #c9b37f;
-  font-size: 1rem;
-  text-align: center;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
-}
-
-.btn-search-ai:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
-}
-
 h1 {
   font-size: clamp(2rem, 5vw, 3.5rem);
   color: #c9b37f;
@@ -561,11 +546,11 @@ h1 {
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none; /* Removido para reduzir caixas */
   border-radius: 12px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 0 30px rgba(189, 166, 91, 0.2);
+  box-shadow: 0 0 10px rgba(189, 166, 91, 0.1); /* Sombra mais sutil */
   transition: transform 0.3s ease;
 }
 
@@ -583,23 +568,29 @@ h1 {
   z-index: 1;
 }
 
-.stats-container {
-  width: 90%;
+/* Novo wrapper para as seções */
+.info-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
   max-width: 800px;
-  margin-top: 1rem;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.stats-container {
+  background: transparent; /* Fundo removido */
+  border: none; /* Borda removida */
+  box-shadow: none; /* Sombra removida */
+  padding: 0; /* Padding reduzido */
 }
 
 .stats-container h3 {
-  font-size: clamp(1.8rem, 4vw, 2rem);
+  font-size: 1.8rem;
   color: #c9b37f;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Separador sutil */
   text-align: center;
 }
 
@@ -639,7 +630,6 @@ h1 {
   }
 }
 
-/* IA Container */
 .ai-container {
   margin-bottom: 2rem;
 }
@@ -770,8 +760,8 @@ input:checked + .toggle-slider:before {
 }
 
 .ai-response-container {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05); /* Fundo mais leve */
+  border: none; /* Borda removida */
   border-radius: 8px;
   padding: 1rem;
   min-height: 100px;
@@ -800,9 +790,9 @@ input:checked + .toggle-slider:before {
 .ai-content {
   padding: 0.5rem;
   line-height: 1.5;
-  flex-grow: 1; /* Permite que o conteúdo se expanda */
-  overflow-y: auto; /* Adiciona rolagem vertical se necessário */
-  max-height: 300px; /* Define uma altura máxima opcional */
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 300px;
 }
 
 .ai-placeholder {
@@ -840,27 +830,20 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
 }
 
-.btn-clear-ai {
-  display: block;
-  margin: 1rem auto 0;
-  padding: 0.6rem 1.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-  font-family: 'Cinzel', serif;
+.btn-search-ai:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
 }
 
-.btn-clear-ai:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+.cooldown-timer {
+  margin-top: 0.5rem;
+  color: #c9b37f;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
 }
 
 .stat-item {
@@ -973,33 +956,11 @@ input:checked + .toggle-slider:before {
 .stat-health { color: #27cc4e; border-color: #27cc4e; }
 .stat-power { color: #cb9501; border-color: #cb9501; }
 .stat-stamina { color: #ff8b2d; border-color: #ff8b2d; }
-.stat-strength { color: #ff5733; border-color: #ff5733; }
 .stat-agility { color: #ffd955; border-color: #ffd955; }
 .stat-critical { color: #e01c1c; border-color: #e01c1c; }
 .stat-haste { color: #0ed59b; border-color: #0ed59b; }
 .stat-mastery { color: #9256ff; border-color: #9256ff; }
 .stat-versatility { color: #bfbfbf; border-color: #bfbfbf; }
-
-.btn-back {
-  margin-top: 2rem;
-  padding: 0.8rem 2rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-}
-
-.btn-back:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-}
 
 @media (max-width: 768px) {
   .image-container {
@@ -1009,11 +970,6 @@ input:checked + .toggle-slider:before {
   }
   .stats-container {
     margin-top: 1.5rem;
-    padding: 1.5rem;
-  }
-  .btn-back {
-    font-size: 1rem;
-    padding: 0.6rem 1.5rem;
   }
 }
 
