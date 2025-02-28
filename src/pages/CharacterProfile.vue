@@ -329,29 +329,28 @@ export default {
       this.updateCooldownTimer();
 
       this.isLoadingAi = true;
-      // const mode = this.isPvE ? 'PvE' : 'PvP';
-      // const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
+      const mode = this.isPvE ? 'PvE' : 'PvP';
+      const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
 
-      // const tokenAi = process.env.VUE_APP_AI_TOKEN;
-      // const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
+      const tokenAi = process.env.VUE_APP_AI_TOKEN;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
 
-      // const requestBody = {
-      //   contents: [{
-      //     parts: [{
-      //       text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
-      //         do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
-      //         ${JSON.stringify(this.equipaments)}`
-      //     }]
-      //   }]
-      // };
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
+              do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
+              ${JSON.stringify(this.equipaments)}`
+          }]
+        }]
+      };
 
-      // const responseAi = await axios.post(url, requestBody, {
-      //     headers: { 'Content-Type': 'application/json' }
-      // });
+      const responseAi = await axios.post(url, requestBody, {
+          headers: { 'Content-Type': 'application/json' }
+      });
       
-      let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
-      responseAi = "blablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla";
-      // this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      // let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
+      this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       this.aiResponse = responseAi;
       this.formatResponse();
       this.isLoadingAi = false;
