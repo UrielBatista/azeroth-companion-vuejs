@@ -1,145 +1,129 @@
 <template>
   <transition name="fade">
-  <div class="modal-backdrop" @click.self="$emit('close')">
-    <div class="modal" :style="{ '--background-image': `url(${backgroundImage})` }">
-      <h2 class="modal-title">Armor level: {{ averageIlvl }}</h2>
-      <div v-if="showSpinner" class="loading-container">
-        <div class="spinner"></div>
-        
-      </div>
-      <div v-else-if="!hasEquipment" class="no-equipment">
-        <p>No equipment found for this character.</p>
-      </div>
-      <div v-else class="modal-content">
-        <div class="side-panel left">
-          <div
-            v-for="item in armorPieces"
-            :key="item.id"
-            class="thumbnail"
-            :class="{ selected: item === currentPiece }"
-            @click="selectPiece(item)"
-          >
-            <img :src="item.image" :alt="item.name" />
-            <div class="tooltip" v-if="item.details">
-              <div class="tooltip-content">
-                <h3>{{ item.details.name }}</h3>
-                <p>{{ item.details.type }}</p>
-                <p>Item Level: {{ item.details.itemLevel }}</p>
-                <p>Transmogrified to: {{ item.details.transmog || 'None' }}</p>
-                <p v-if="item.details.bind">Binds: {{ item.details.bind }}</p>
-                <ul>
-                  <li v-for="stat in item.details.stats" :key="stat.name">
-                    +{{ stat.value }} {{ stat.name }}
-                  </li>
-                </ul>
-                <p v-if="item.details.socket">Socket: {{ item.details.socket }}</p>
-                <p>Requires Level: {{ item.details.requiredLevel }}</p>
-                <p>Sell Price: {{ item.details.sellPrice }}</p>
+    <div class="modal-backdrop" @click.self="$emit('close')">
+      <div class="modal" :style="{ '--background-image': `url(${backgroundImage})` }">
+        <h2 class="modal-title">Armor level: {{ averageIlvl }}</h2>
+        <div v-if="showSpinner" class="loading-container">
+          <div class="spinner"></div>
+        </div>
+        <div v-else-if="!hasEquipment" class="no-equipment">
+          <p>No equipment found for this character.</p>
+        </div>
+        <div v-else class="modal-content">
+          <div class="side-panel left" :class="{ 'loaded': isContentLoaded }">
+            <div
+              v-for="(item, index) in armorPieces"
+              :key="item.id"
+              class="thumbnail"
+              :class="{ selected: item === currentPiece, 'loaded': isContentLoaded }"
+              @click="selectPiece(item)"
+              :style="{ animationDelay: `${index * 0.1}s` }"
+            >
+              <img :src="item.image" :alt="item.name" />
+              <div class="tooltip" v-if="item.details">
+                <div class="tooltip-content">
+                  <h3>{{ item.details.name }}</h3>
+                  <p>{{ item.details.type }}</p>
+                  <p>Item Level: {{ item.details.itemLevel }}</p>
+                  <p>Transmogrified to: {{ item.details.transmog || 'None' }}</p>
+                  <p v-if="item.details.bind">Binds: {{ item.details.bind }}</p>
+                  <ul>
+                    <li v-for="stat in item.details.stats" :key="stat.name">
+                      +{{ stat.value }} {{ stat.name }}
+                    </li>
+                  </ul>
+                  <p v-if="item.details.socket">Socket: {{ item.details.socket }}</p>
+                  <p>Requires Level: {{ item.details.requiredLevel }}</p>
+                  <p>Sell Price: {{ item.details.sellPrice }}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="central-display">
-          <img :src="characterImage" alt="Character Armor" />
-        </div>
+          <div class="central-display">
+            <img :src="characterImage" alt="Character Armor" />
+          </div>
 
-        <div class="side-panel right">
-          <div
-            v-for="item in rightItems"
-            :key="item.id"
-            class="thumbnail"
-            :class="{ selected: item === currentRightItem }"
-            @click="selectRightItem(item)"
-          >
-            <img :src="item.image" :alt="item.name" />
-            <div class="tooltip" v-if="item.details">
-              <div class="tooltip-content">
-                <h3>{{ item.details.name }}</h3>
-                <p>{{ item.details.type }}</p>
-                <p>Item Level: {{ item.details.itemLevel }}</p>
-                <p>Transmogrified to: {{ item.details.transmog || 'None' }}</p>
-                <p v-if="item.details.bind">Binds: {{ item.details.bind }}</p>
-                <ul>
-                  <li v-for="stat in item.details.stats" :key="stat.name">
-                    +{{ stat.value }} {{ stat.name }}
-                  </li>
-                </ul>
-                <p v-if="item.details.socket">Socket: {{ item.details.socket }}</p>
-                <p>Requires Level: {{ item.details.requiredLevel }}</p>
-                <p>Sell Price: {{ item.details.sellPrice }}</p>
+          <div class="side-panel right" :class="{ 'loaded': isContentLoaded }">
+            <div
+              v-for="(item, index) in rightItems"
+              :key="item.id"
+              class="thumbnail"
+              :class="{ selected: item === currentRightItem, 'loaded': isContentLoaded }"
+              @click="selectRightItem(item)"
+              :style="{ animationDelay: `${index * 0.1}s` }"
+            >
+              <img :src="item.image" :alt="item.name" />
+              <div class="tooltip" v-if="item.details">
+                <div class="tooltip-content">
+                  <h3>{{ item.details.name }}</h3>
+                  <p>{{ item.details.type }}</p>
+                  <p>Item Level: {{ item.details.itemLevel }}</p>
+                  <p>Transmogrified to: {{ item.details.transmog || 'None' }}</p>
+                  <p v-if="item.details.bind">Binds: {{ item.details.bind }}</p>
+                  <ul>
+                    <li v-for="stat in item.details.stats" :key="stat.name">
+                      +{{ stat.value }} {{ stat.name }}
+                    </li>
+                  </ul>
+                  <p v-if="item.details.socket">Socket: {{ item.details.socket }}</p>
+                  <p>Requires Level: {{ item.details.requiredLevel }}</p>
+                  <p>Sell Price: {{ item.details.sellPrice }}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="bottom-icons">
-          <div 
-            v-for="icon in bottomIcons" 
-            :key="icon.id" 
-            class="thumbnail" 
-            :class="{ selected: icon === currentBottomIcons }" 
-            @click="selectBottomIcons(icon)"
-          >
-            <img :src="icon.image" :alt="icon.name" />
-            <div class="tooltip" v-if="icon.details">
-              <div class="tooltip-content">
-                <h3>{{ icon.details.name }}</h3>
-                <p>{{ icon.details.type }}</p>
-                <p>Item Level: {{ icon.details.itemLevel }}</p>
-                <p>Transmogrified to: {{ icon.details.transmog || 'None' }}</p>
-                <p v-if="icon.details.bind">Binds: {{ icon.details.bind }}</p>
-                <ul>
-                  <li v-for="stat in icon.details.stats" :key="stat.name">
-                    +{{ stat.value }} {{ stat.name }}
-                  </li>
-                </ul>
-                <p v-if="icon.details.socket">Socket: {{ item.details.socket }}</p>
-                <p>Requires Level: {{ icon.details.requiredLevel }}</p>
-                <p>Sell Price: {{ icon.details.sellPrice }}</p>
+          <div class="bottom-icons" :class="{ 'loaded': isContentLoaded }">
+            <div
+              v-for="(icon, index) in bottomIcons"
+              :key="icon.id"
+              class="thumbnail"
+              :class="{ selected: icon === currentBottomIcons, 'loaded': isContentLoaded }"
+              @click="selectBottomIcons(icon)"
+              :style="{ animationDelay: `${index * 0.1}s` }"
+            >
+              <img :src="icon.image" :alt="icon.name" />
+              <div class="tooltip" v-if="icon.details">
+                <div class="tooltip-content">
+                  <h3>{{ icon.details.name }}</h3>
+                  <p>{{ icon.details.type }}</p>
+                  <p>Item Level: {{ icon.details.itemLevel }}</p>
+                  <p>Transmogrified to: {{ icon.details.transmog || 'None' }}</p>
+                  <p v-if="icon.details.bind">Binds: {{ icon.details.bind }}</p>
+                  <ul>
+                    <li v-for="stat in icon.details.stats" :key="stat.name">
+                      +{{ stat.value }} {{ stat.name }}
+                    </li>
+                  </ul>
+                  <p v-if="icon.details.socket">Socket: {{ icon.details.socket }}</p>
+                  <p>Requires Level: {{ icon.details.requiredLevel }}</p>
+                  <p>Sell Price: {{ icon.details.sellPrice }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</transition>
+  </transition>
 </template>
   
 <script>
 export default {
   name: 'ArmorModal',
   props: {
-    characterImage: {
-      type: String,
-      required: true,
-    },
-    backgroundImage: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    realm: {
-      type: String,
-      required: true,
-    },
-    averageIlvl: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    equipaments: {
-      type: Object,
-      required: true,
-    }
+    characterImage: { type: String, required: true },
+    backgroundImage: { type: String, required: true },
+    name: { type: String, required: true },
+    realm: { type: String, required: true },
+    averageIlvl: { type: Number, required: true, default: 0 },
+    equipaments: { type: Object, required: true },
   },
   data() {
     return {
       isLoading: true,
+      isContentLoaded: false, // Novo controle para o fade-in
       currentPiece: null,
       currentRightItem: null,
       currentBottomIcons: null,
@@ -157,7 +141,6 @@ export default {
     },
   },
   methods: {
-    
     selectPiece(piece) {
       this.currentPiece = piece;
     },
@@ -172,7 +155,6 @@ export default {
       const token = process.env.VUE_APP_WOW_TOKEN;
       const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
       try {
-        
         const equipment = this.equipaments.equipped_items || [];
 
         const slotMapping = {
@@ -186,7 +168,7 @@ export default {
         const itemPromises = equipment.map(async item => {
           const slotName = slotMapping[item.slot.type];
           if (!slotName) return null;
-          
+
           const mediaUrl = `https://us.api.blizzard.com/data/wow/media/item/${item.item.id}?namespace=static-us&locale=en_US`;
           const detailsUrl = `https://us.api.blizzard.com/data/wow/item/${item.item.id}?namespace=static-us&locale=en_US`;
 
@@ -200,7 +182,7 @@ export default {
 
             const mediaData = await mediaResponse.json();
             const detailsData = await detailsResponse.json();
-            
+
             return {
               id: item.item.id,
               name: slotName,
@@ -236,6 +218,8 @@ export default {
         if (this.armorPieces.length) this.currentPiece = this.armorPieces[0];
         if (this.rightItems.length) this.currentRightItem = this.rightItems[0];
         if (this.bottomIcons.length) this.currentBottomIcons = this.bottomIcons[0];
+
+        this.isContentLoaded = true; // Ativa o fade-in após o carregamento
       } catch (error) {
         console.error('Error loading equipment:', error);
       } finally {
@@ -274,8 +258,8 @@ export default {
 
 .modal {
   background-image: var(--background-image);
-  background-size: cover; 
-  background-position: center; 
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   backdrop-filter: blur(8px) saturate(180%);
   -webkit-backdrop-filter: blur(8px) saturate(180%);
@@ -387,6 +371,62 @@ export default {
   z-index: 1001;
 }
 
+/* Estado inicial dos thumbnails */
+.side-panel.left .thumbnail,
+.side-panel.right .thumbnail,
+.bottom-icons .thumbnail {
+  opacity: 0;
+}
+
+/* Animação para thumbnails do side-panel left */
+.side-panel.left .thumbnail.loaded {
+  animation: fadeInFromLeft 0.5s ease-in-out forwards;
+}
+
+/* Animação para thumbnails do side-panel right */
+.side-panel.right .thumbnail.loaded {
+  animation: fadeInFromRight 0.5s ease-in-out forwards;
+}
+
+/* Animação para thumbnails do bottom-icons */
+.bottom-icons .thumbnail.loaded {
+  animation: fadeInFromBottom 0.5s ease-in-out forwards;
+}
+
+/* Definição das animações */
+@keyframes fadeInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .thumbnail img {
   width: 100%;
   height: 100%;
@@ -456,16 +496,6 @@ export default {
   box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
 }
 
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
 .tooltip {
   display: none;
   position: absolute;
@@ -481,7 +511,6 @@ export default {
   font-family: 'Cinzel', serif;
   box-shadow: 0 4px 15px rgba(31, 38, 135, 0.37);
 }
-
 
 .side-panel.left .thumbnail:hover .tooltip {
   display: block;
@@ -536,4 +565,3 @@ export default {
   color: #00ff00;
 }
 </style>
-  

@@ -8,12 +8,14 @@
   <div class="overlay"></div>
 
   <div class="profile-container">
-    <div v-if="!stats" class="loading-spinner"></div>
     <h1>{{ name }}-{{ realm }}</h1>
     <character-details :details="characterInfo" />
 
-    <div class="image-container" :style="{ '--background-image': `url(${backgroundImage})` }">
-      <div v-if="!imageLoaded" class="loading-spinner"></div>
+    <div 
+      class="image-container" 
+      :class="{ 'loaded': isContentLoaded }"
+      :style="{ '--background-image': `url(${backgroundImage})` }"
+    >
       <img 
         :src="imageArmor" 
         alt="Personagem" 
@@ -23,7 +25,6 @@
       />
     </div>
 
-    <!-- Novo wrapper para agrupar as seções -->
     <div class="info-wrapper">
       <div class="stats-container">
         <div v-if="!stats" class="loading-spinner"></div>
@@ -193,6 +194,7 @@ export default {
       pvp2s: null,
       pvp3s: null,
       imageLoaded: false,
+      backgroundLoaded: false,
       lastSearchTime: null, 
       remainingTime: 0,
       isLoadingAi: false,
@@ -251,6 +253,9 @@ export default {
         { key: 'versatility', label: 'VERSATILITY', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
       ].filter(stat => stat.value !== undefined);
     },
+    isContentLoaded() {
+      return this.imageLoaded && this.backgroundLoaded;
+    },
     backgroundImage() {
       const classType = this.characterInfo.classtype || 'Rogue';
       return this.classBackgrounds[classType] || this.classBackgrounds['Rogue'];
@@ -264,7 +269,7 @@ export default {
     formattedRemainingTime() {
       const minutes = Math.floor(this.remainingTime / 60);
       const seconds = this.remainingTime % 60;
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`; // Ex: "4:32"
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     },
   },
   mounted() {
@@ -272,6 +277,8 @@ export default {
     this.fetchEquipaments();
     this.fetchStats();
     this.fetchPvPBracket();
+    this.loadBackgroundImage();
+    this.checkImageLoaded();
     // window.history.pushState({}, document.title, this.$route.path);
 
     const savedTime = localStorage.getItem('lastSearchTime');
@@ -281,6 +288,36 @@ export default {
     }
   },
   methods: {
+    loadBackgroundImage() {
+      const img = new Image();
+      img.src = this.backgroundImage;
+      if (img.complete) {
+        this.backgroundLoaded = true;
+      } else {
+        img.onload = () => {
+          this.backgroundLoaded = true;
+        };
+        img.onerror = () => {
+          console.error('Erro ao carregar a imagem de fundo');
+          this.backgroundLoaded = true;
+        };
+      }
+    },
+    checkImageLoaded() {
+      const img = new Image();
+      img.src = this.imageArmor;
+      if (img.complete) {
+        this.imageLoaded = true;
+      } else {
+          img.onload = () => {
+          this.imageLoaded = true;
+        };
+        img.onerror = () => {
+          console.error('Erro ao carregar a imagem do personagem');
+          this.imageLoaded = true;
+        };
+      }
+    },
     updateCooldownTimer() {
       if (!this.lastSearchTime) {
         this.remainingTime = 0;
@@ -535,6 +572,8 @@ h1 {
   background-repeat: no-repeat;
   filter: blur(6px);
   z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .image-container {
@@ -546,16 +585,26 @@ h1 {
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  border: none; /* Removido para reduzir caixas */
   border-radius: 12px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 0 10px rgba(189, 166, 91, 0.1); /* Sombra mais sutil */
-  transition: transform 0.3s ease;
+  box-shadow: 0 0 10px rgba(189, 166, 91, 0.1);
+  transition: transform 0.5s ease;
+  opacity: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease-in-out;
+}
+
+.image-container.loaded {
+  opacity: 1;
+}
+
+.image-container.loaded::before {
+  opacity: 1;
 }
 
 .image-container:hover {
   transform: scale(1.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .character-image {
@@ -566,9 +615,14 @@ h1 {
   filter: contrast(1.2) saturate(1.1);
   position: relative;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
 }
 
-/* Novo wrapper para as seções */
+.image-container.loaded .character-image {
+  opacity: 1;
+}
+
 .info-wrapper {
   display: flex;
   flex-direction: column;
@@ -579,10 +633,10 @@ h1 {
 }
 
 .stats-container {
-  background: transparent; /* Fundo removido */
-  border: none; /* Borda removida */
-  box-shadow: none; /* Sombra removida */
-  padding: 0; /* Padding reduzido */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 .stats-container h3 {
@@ -590,7 +644,7 @@ h1 {
   color: #c9b37f;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Separador sutil */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
 }
 
@@ -760,8 +814,8 @@ input:checked + .toggle-slider:before {
 }
 
 .ai-response-container {
-  background: rgba(255, 255, 255, 0.05); /* Fundo mais leve */
-  border: none; /* Borda removida */
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
   border-radius: 8px;
   padding: 1rem;
   min-height: 100px;
