@@ -329,28 +329,30 @@ export default {
       this.updateCooldownTimer();
 
       this.isLoadingAi = true;
-      const mode = this.isPvE ? 'PvE' : 'PvP';
-      const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
+      // const mode = this.isPvE ? 'PvE' : 'PvP';
+      // const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
 
-      const tokenAi = process.env.VUE_APP_AI_TOKEN;
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
+      // const tokenAi = process.env.VUE_APP_AI_TOKEN;
+      // const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
 
-      const requestBody = {
-        contents: [{
-          parts: [{
-            text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
-              do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
-              ${JSON.stringify(this.equipaments)}`
-          }]
-        }]
-      };
+      // const requestBody = {
+      //   contents: [{
+      //     parts: [{
+      //       text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
+      //         do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
+      //         ${JSON.stringify(this.equipaments)}`
+      //     }]
+      //   }]
+      // };
 
-      const responseAi = await axios.post(url, requestBody, {
-          headers: { 'Content-Type': 'application/json' }
-      });
-      // let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
+      // const responseAi = await axios.post(url, requestBody, {
+      //     headers: { 'Content-Type': 'application/json' }
+      // });
       
-      this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
+      responseAi = "blablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla";
+      // this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      this.aiResponse = responseAi;
       this.formatResponse();
       this.isLoadingAi = false;
     },
@@ -402,8 +404,18 @@ export default {
 
       try {
         const [response2s, response3s] = await Promise.all([
-          axios.get(pvp2s, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(pvp3s, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(pvp2s, { headers: { Authorization: `Bearer ${token}` } })
+          .catch(err => {
+            err;
+            console.log('Not Found 2x2');
+            return {data: {rating: 0, season_match_statistics: {lost: 0, won: 0, played: 0}}};
+          }),
+          axios.get(pvp3s, { headers: { Authorization: `Bearer ${token}` } })
+          .catch(err => {
+            err;
+            console.log('Not Found 3x3');
+            return {data: {rating: 0, season_match_statistics: {lost: 0, won: 0, played: 0}}};
+          }),
         ]);
         this.pvp2s = response2s.data;
         this.pvp3s = response3s.data;
