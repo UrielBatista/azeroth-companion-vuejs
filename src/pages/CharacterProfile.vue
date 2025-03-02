@@ -351,7 +351,7 @@ export default {
       this.formattedResponse = formatted;
     },
     async fetchEquipaments() {
-        const token = process.env.VUE_APP_WOW_TOKEN;
+        const token = localStorage.getItem('access_token');
         const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
         const responseEquipments = await apiFetch(equipmentUrl);
@@ -405,7 +405,7 @@ export default {
     },
     async fetchCharacterData() {
       try {
-        const token = process.env.VUE_APP_WOW_TOKEN;
+        const token = localStorage.getItem('access_token');
         const realmParam = this.realmPath.toLowerCase();
         const nameParam = this.name.toLowerCase();
         const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}?namespace=profile-us&locale=en_US`;
@@ -422,7 +422,7 @@ export default {
     },
     async fetchStats() {
       try {
-        const token = process.env.VUE_APP_WOW_TOKEN;
+        const token = localStorage.getItem('access_token');
         const realmParam = this.realmPath.toLowerCase();
         const nameParam = this.name.toLowerCase();
         const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/statistics?namespace=profile-us&locale=en_US`;
@@ -435,7 +435,7 @@ export default {
       }
     },
     async fetchPvPBracket() {
-      const token = process.env.VUE_APP_WOW_TOKEN;
+      const token = localStorage.getItem('access_token');
       const realmParam = this.realmPath.toLowerCase();
       const nameParam = this.name.toLowerCase();
       const pvp2s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/2v2?namespace=profile-us&locale=en_US`;

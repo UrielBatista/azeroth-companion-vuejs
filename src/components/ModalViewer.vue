@@ -152,7 +152,7 @@ export default {
     },
     async fetchEquipment() {
       this.isLoading = true;
-      const token = process.env.VUE_APP_WOW_TOKEN;
+      const token = localStorage.getItem('access_token');
       const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
       try {
         const equipment = this.equipaments.equipped_items || [];

@@ -119,9 +119,52 @@ export default {
     };
   },
   mounted() {
+    this.checkAndRefreshToken();
     this.filteredReigns = this.allReigns;
   },
   methods: {
+    async checkAndRefreshToken() {
+      const token = localStorage.getItem('access_token');
+      const tokenTimestamp = localStorage.getItem('token_timestamp');
+
+      if (token && tokenTimestamp) {
+        const currentTime = new Date().getTime();
+        const tokenTime = new Date(tokenTimestamp).getTime();
+        const hoursPassed = (currentTime - tokenTime) / (1000 * 60 * 60);
+
+        if (hoursPassed < 12) {
+          return;
+        }
+      }
+
+      await this.fetchNewToken();
+    },
+    async fetchNewToken() {
+      try {
+        const clientId = process.env.VUE_APP_CLIENT_ID;
+        const clientSecret = process.env.VUE_APP_CLIENT_SECRET;
+
+        const response = await axios.post(
+          'https://oauth.battle.net/token',
+          'grant_type=client_credentials',
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            auth: {
+              username: clientId,
+              password: clientSecret
+            }
+          }
+        );
+        const accessToken = response.data.access_token;
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('token_timestamp', new Date().toISOString());
+
+      } catch (error) {
+        console.error('Exception token error:', error);
+      }
+    },
     toggleMute() {
       this.isMuted = !this.isMuted;
       if (!this.isMuted) {
@@ -185,7 +228,7 @@ export default {
       }
 
       try {
-        const token = process.env.VUE_APP_WOW_TOKEN;
+        const token = localStorage.getItem('access_token');
         const searchUsername = this.username.trim().toLowerCase();
         const searchReign = this.reign.trim().toLowerCase();
         const response = await axios.get(
