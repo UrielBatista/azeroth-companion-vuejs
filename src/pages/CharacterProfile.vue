@@ -25,6 +25,8 @@
       />
     </div>
 
+      <class-info :classType="characterInfo.classtype" />
+
     <div class="info-wrapper">
       <div class="stats-container">
         <div v-if="!stats" class="loading-spinner"></div>
@@ -143,6 +145,7 @@
 import axios from 'axios';
 import ArmorModal from '../components/ModalViewer.vue';
 import CharacterDetails from '../components/CharacterDetails.vue';
+import ClassInfo from '../components/ClassInfo.vue';
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
@@ -171,6 +174,7 @@ export default {
   components: {
     ArmorModal,
     CharacterDetails,
+    ClassInfo,
   },
   data() {
     return {
@@ -184,7 +188,7 @@ export default {
         guild: '',
         lastLogin: null
       },
-      formattedResponse: '',
+      formattedResponse: "",
       name: this.$route.query.name || 'Unknown',
       realm: this.$route.query.realm || 'Unknown',
       realmPath: this.$route.query.realmPath || 'Unknow',
@@ -215,7 +219,7 @@ export default {
       classBackgrounds: {
         'Death Knight': deathknightBackground,
         'Demon Hunter': demonhunterBackground,
-        'Dragon': dragonBackground,
+        'Evoker': dragonBackground,
         'Druid': druidBackground,
         'Hunter': hunterBackground,
         'Mage': mageBackground,
@@ -385,8 +389,8 @@ export default {
       const responseAi = await axios.post(url, requestBody, {
           headers: { 'Content-Type': 'application/json' }
       });
-      
       // let responseAi = await new Promise(resolve => setTimeout(resolve, 5000));
+
       this.aiResponse = responseAi.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       this.formatResponse();
       this.isLoadingAi = false;
@@ -473,9 +477,9 @@ export default {
     },
     openArmorModal() {
       this.showArmorModal = true;
-      let elevate = 0.96;
+      let elevate = 0.79;
       if (!this.aiResponse){
-        elevate = 0.95;
+        elevate = 0.75;
       }
       this.$nextTick(() => {
         window.scrollTo({
@@ -686,13 +690,26 @@ h1 {
 
 .ai-container {
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.loading-gif {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+.ai-container h3 {
+  font-size: 1.8rem;
+  color: #c9b37f;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.loading-gif img {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: block;
 }
 
 .loading-gif img {
@@ -715,15 +732,15 @@ h1 {
 
 .toggle-label {
   color: #c9b37f;
-  margin-right: 1rem;
-  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  font-size: 1rem;
 }
 
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 120px;
-  height: 34px;
+  width: 80px;
+  height: 24px;
 }
 
 .toggle-switch input {
@@ -739,21 +756,20 @@ h1 {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   transition: 0.4s;
-  border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 5px;
 }
 
 .toggle-option {
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 0.8rem;
   transition: all 0.3s ease;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .toggle-pvp { color: #e01c1c; }
@@ -762,70 +778,74 @@ h1 {
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 50%;
-  left: 0.1px;
+  height: 20px;
+  width: 40px;
+  left: 2px;
+  bottom: 2px;
   background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
   transition: 0.4s;
-  border-radius: 34px;
+  border-radius: 20px;
   box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
 }
 
 input:checked + .toggle-slider:before {
-  transform: translateX(100%);
+  transform: translateX(38px);
 }
 
 .checkbox-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .checkbox-container input {
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .checkbox-container input:checked {
   background: #c9b37f;
   border-color: #c9b37f;
-  position: relative;
 }
 
 .checkbox-container input:checked:after {
   content: '✓';
   position: absolute;
   color: #000;
-  font-size: 14px;
-  left: 4px;
-  bottom: 0.1px;
+  font-size: 12px;
+  left: 3px;
+  top: 1px;
 }
 
 .checkbox-container label {
   color: #ffffff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
 }
 
 .ai-response-container {
   background: rgba(255, 255, 255, 0.05);
-  border: none;
   border-radius: 8px;
   padding: 1rem;
   min-height: 100px;
   display: flex;
   flex-direction: column;
+  margin-top: 1rem;
 }
 
 .ai-response {
   color: #ffffff;
   font-family: 'Arial', sans-serif;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
 }
 
 .ai-header {
@@ -837,7 +857,7 @@ input:checked + .toggle-slider:before {
 
 .ai-title {
   color: #c9b37f;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
 }
 
@@ -857,22 +877,20 @@ input:checked + .toggle-slider:before {
 }
 
 .btn-container {
-  margin-top: 10px;
-  margin-bottom: -20px;
+  margin-top: 1rem;
+  text-align: center;
 }
 
 .btn-search-ai {
-  display: block;
-  margin: 0 auto 1rem;
-  padding: 0.8rem 2rem;
-  font-size: 1.2rem;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 1px;
   background: linear-gradient(135deg, rgba(201, 179, 127, 0.8), rgba(189, 166, 91, 0.8));
   border: none;
-  border-radius: 25px;
+  border-radius: 20px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
@@ -880,8 +898,8 @@ input:checked + .toggle-slider:before {
 }
 
 .btn-search-ai:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
 }
 
 .btn-search-ai:disabled {
@@ -894,10 +912,8 @@ input:checked + .toggle-slider:before {
 .cooldown-timer {
   margin-top: 0.5rem;
   color: #c9b37f;
-  font-size: 1rem;
+  font-size: 0.9rem;
   text-align: center;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
 }
 
 .stat-item {
@@ -1000,6 +1016,11 @@ input:checked + .toggle-slider:before {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
