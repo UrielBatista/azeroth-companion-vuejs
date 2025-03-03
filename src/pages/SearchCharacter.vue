@@ -255,9 +255,14 @@ export default {
         this.searchTerm = "";
         this.submitted = false;
       } catch (error) {
+        if (error.status === 404){
+          alert("Personagem não existe ou disabilitado para buscas");
+          this.submitted = false;
+        } else {
         console.error("Erro ao buscar personagem:", error);
         alert("Erro ao buscar personagem");
         this.submitted = false;
+        }
       }
     }
   }
