@@ -350,18 +350,6 @@ export default {
 
       this.formattedResponse = formatted;
     },
-    async fetchEquipaments() {
-        const token = localStorage.getItem('access_token');
-        const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realm.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
-        const responseEquipments = await apiFetch(equipmentUrl);
-        
-        if (!responseEquipments.ok) throw new Error('Failed to fetch equipment');
-        
-        const data = await responseEquipments.json();
-        
-        this.equipaments = data;
-    },
     async updateAIMode() {
 
       if (this.isSearchDisabled) return;
@@ -412,6 +400,7 @@ export default {
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
         this.updateCharacterData(response.data);
       } catch (error) {
         console.error('Erro ao buscar dados do personagem:', error);
@@ -419,6 +408,18 @@ export default {
         this.realm = this.$route.query.realm || 'Unknown';
         this.level = this.$route.query.level || 0;
       }
+    },
+    async fetchEquipaments() {
+        const token = localStorage.getItem('access_token');
+        const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realmPath.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
+        const responseEquipments = await apiFetch(equipmentUrl);
+        
+        if (!responseEquipments.ok) throw new Error('Failed to fetch equipment');
+        
+        const data = await responseEquipments.json();
+        this.equipaments = data;
+
     },
     async fetchStats() {
       try {
