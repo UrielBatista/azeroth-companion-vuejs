@@ -24,8 +24,12 @@
         @load="imageLoaded = true"
       />
     </div>
-
-      <class-info :classType="characterInfo.classtype" />
+    <alts-list
+    :alts="alts" 
+    :backgroundImage="backgroundImage"/>
+    
+    <class-info :classType="characterInfo.classtype" />
+    
 
     <div class="info-wrapper">
       <div class="stats-container">
@@ -146,6 +150,7 @@ import axios from 'axios';
 import ArmorModal from '../components/ModalViewer.vue';
 import CharacterDetails from '../components/CharacterDetails.vue';
 import ClassInfo from '../components/ClassInfo.vue';
+import AltsList from '../components/AltsList.vue';
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
@@ -175,6 +180,7 @@ export default {
     ArmorModal,
     CharacterDetails,
     ClassInfo,
+    AltsList,
   },
   data() {
     return {
@@ -206,6 +212,7 @@ export default {
       isPvE: false,
       searchStrategicRotation: false,
       aiResponse: null,
+      alts: [],
       statIcons: {
         health: require('@/assets/icons/health.svg'),
         power: require('@/assets/icons/energy.svg'),
@@ -283,6 +290,7 @@ export default {
     this.fetchPvPBracket();
     this.loadBackgroundImage();
     this.checkImageLoaded();
+    this.fetchAlts();
     // window.history.pushState({}, document.title, this.$route.path);
 
     const savedTime = localStorage.getItem('lastSearchTime');
@@ -390,6 +398,20 @@ export default {
       this.aiResponse = null;
       this.isPvE = false;
       this.searchStrategicRotation = false;
+    },
+    async fetchAlts() {
+      try {
+        const realmParam = this.realm;
+        const nameParam = this.name;
+        const url = `https://scrapping-python-alts-production.up.railway.app/alts/${realmParam}/${nameParam}`;
+        const response = await axios.get(url);
+        this.alts = response.data.data.alts;
+        this.isLoadingAlts = false;
+        
+      } catch (error) {
+        console.error('Erro ao buscar alts:', error);
+        this.alts = [];
+      }
     },
     async fetchCharacterData() {
       try {
