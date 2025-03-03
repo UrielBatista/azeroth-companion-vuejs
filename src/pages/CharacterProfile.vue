@@ -24,9 +24,12 @@
         @load="imageLoaded = true"
       />
     </div>
-    <div v-if="isLoadingAlts" class="loading-spinner"></div>
-    <alts-list v-else :alts="alts" class="alts-list-animate" :backgroundImage="backgroundImage"/>
-    
+
+    <div class="alts-container">
+      <h3>Alternate Characters</h3>
+        <div v-if="isLoadingAlts" class="loading-spinner"></div>
+          <alts-list v-else :alts="alts" class="alts-list-animate" :backgroundImage="backgroundImage"/>
+        </div>
     <class-info :classType="characterInfo.classtype" />
     
 
@@ -412,6 +415,7 @@ export default {
       } catch (error) {
         console.error('Erro ao buscar alts:', error);
         this.alts = [];
+        this.isLoadingAlts = false;
       }
     },
     async fetchCharacterData() {
@@ -547,6 +551,21 @@ export default {
   object-fit: cover;
   transform: translate(-50%, -50%);
   z-index: -2;
+}
+
+.alts-container {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+
+.alts-container h3 {
+  font-size: 1.8rem;
+  color: #c9b37f;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
 }
 
 .overlay {

@@ -1,7 +1,4 @@
 <template>
-    <div class="alts-container">
-      <h2>Related Alts</h2>
-  
       <!-- Campo de busca -->
       <div class="search-container">
         <input
@@ -53,7 +50,6 @@
           No alts found matching your search.
         </p>
       </transition>
-    </div>
 </template>
 
 <script>
@@ -160,22 +156,6 @@ export default {
 </script>
 
 <style scoped>
-.alts-container {
-  margin-top: 2rem;
-  width: 100%;
-}
-
-.alts-container h2 {
-  font-size: 1.8rem;
-  color: #c9b37f;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: center;
-  font-family: 'Cinzel', serif;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-}
-
 /* Campo de busca */
 .search-container {
   margin-bottom: 1.5rem;
