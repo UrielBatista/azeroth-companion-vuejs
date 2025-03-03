@@ -24,9 +24,8 @@
         @load="imageLoaded = true"
       />
     </div>
-    <alts-list
-    :alts="alts" 
-    :backgroundImage="backgroundImage"/>
+    <div v-if="isLoadingAlts" class="loading-spinner"></div>
+    <alts-list v-else :alts="alts" class="alts-list-animate" :backgroundImage="backgroundImage"/>
     
     <class-info :classType="characterInfo.classtype" />
     
@@ -213,6 +212,7 @@ export default {
       searchStrategicRotation: false,
       aiResponse: null,
       alts: [],
+      isLoadingAlts: true,
       statIcons: {
         health: require('@/assets/icons/health.svg'),
         power: require('@/assets/icons/energy.svg'),
@@ -400,6 +400,7 @@ export default {
       this.searchStrategicRotation = false;
     },
     async fetchAlts() {
+      this.isLoadingAlts = true;
       try {
         const realmParam = this.realm;
         const nameParam = this.name;
@@ -1035,10 +1036,7 @@ input:checked + .toggle-slider:before {
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: 2rem auto; /* Centraliza no fluxo do layout */
 }
 
 @keyframes fadeIn {
@@ -1047,8 +1045,8 @@ input:checked + .toggle-slider:before {
 }
 
 @keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .stat-health { color: #27cc4e; border-color: #27cc4e; }
@@ -1076,5 +1074,20 @@ input:checked + .toggle-slider:before {
   margin: 0 auto 1vw auto;
   width: 4vw;
   height: 4vw;
+}
+
+.alts-list-animate {
+  animation: slideUp 1.2s ease-out forwards;
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>
