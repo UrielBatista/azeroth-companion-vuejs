@@ -15,6 +15,7 @@
           v-for="alt in paginatedAlts"
           :key="alt.name + alt.realm"
           class="alt-card"
+          @click="handleClick(alt.name, alt.realm)"
           :style="{ backgroundImage: `url(${getBackground(alt.class)})` }"
         >
           <div class="alt-info">
@@ -54,6 +55,8 @@
 
 <script>
 
+import axios from 'axios';
+
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
 import dragonBackground from '@/assets/dragon-background.webp';
@@ -70,6 +73,7 @@ import shamanBackground from '@/assets/xama-background.webp';
 
 export default {
   name: 'AltsList',
+  inheritAttrs: false,
   props: {
     alts: {
       type: Array,
@@ -81,6 +85,7 @@ export default {
       searchQuery: '',
       currentPage: 1,
       itemsPerPage: 3,
+      backgroundImage: '',
     };
   },
   computed: {
@@ -100,6 +105,43 @@ export default {
     },
   },
   methods: {
+    async handleClick(name, realm) {
+      console.log(name, realm);
+
+      try {
+        const token = localStorage.getItem('access_token');
+        const searchUsername = name.toLowerCase();
+        const searchReign = realm.toLowerCase();
+        const response = await axios.get(
+          `https://us.api.blizzard.com/profile/wow/character/${searchReign}/${searchUsername}/character-media?namespace=profile-us`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const characterName = response.data.character.name;
+        const characterRealm = response.data.character.realm.name.en_US;
+        const characterImage = response.data.assets.find(asset => asset.key === "main-raw").value;
+
+        this.$router.push({
+          name: 'CharacterProfile',
+          query: {
+            name: characterName,
+            realm: characterRealm,
+            realmPath: searchReign,
+            image: characterImage,
+          }
+        });
+
+      } catch (error) {
+        if (error.status === 404){
+          alert("Personagem não existe ou disabilitado para buscas");
+          this.submitted = false;
+        } else {
+        console.error("Erro ao buscar personagem:", error);
+        alert("Erro ao buscar personagem");
+        this.submitted = false;
+        }
+      }
+    },
     getClassName(classId) {
       const classMap = {
         1: 'Warrior',
@@ -114,7 +156,7 @@ export default {
         10: 'Monk',
         11: 'Druid',
         12: 'Demon Hunter',
-        13: 'Evoker', // Supondo que "dragon" seja para Evoker
+        13: 'Evoker',
       };
       return classMap[classId] || 'Unknown';
     },
@@ -264,9 +306,9 @@ export default {
   height: auto;
   border-radius: 8px;
   margin-bottom: 0.8rem;
-  z-index: 1; /* Garante que a imagem fique acima do fundo desfocado */
+  z-index: 1;
   transition: transform 0.3s ease;
-  position: relative; /* Adicionado para reforçar a camada */
+  position: relative;
 }
 
 .alt-card:hover .alt-thumbnail {
@@ -275,8 +317,8 @@ export default {
 
 .alt-info {
   text-align: center;
-  z-index: 1; /* Garante que o texto fique acima do fundo desfocado */
-  position: relative; /* Adicionado para reforçar a camada */
+  z-index: 1;
+  position: relative;
 }
 
 .alt-info h3 {

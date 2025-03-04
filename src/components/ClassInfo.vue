@@ -28,7 +28,7 @@
             return 'Este é o dever do paladino: proteger os fracos, trazer justiça aos injustos e exterminar o mal nos confins mais sombrios do mundo. Estes guerreiros sagrados estão equipados com armaduras de placas para enfrentar os inimigos mais perigosos e são adeptos da benção da Luz que lhes permite curar feridas, e em alguns casos, ressuscitar os mortos.'
           case 'Hunter':
             return 'Desde cedo, o chamado das selvas incita alguns aventureiros a deixarem a comodidade de seus lares para adentrarem o impiedoso mundo selvagem. Aqueles que sobrevivem acabam se tornando caçadores. Senhores de seu domínio, os caçadores são capazes de deslizar como fantasmas por entre as árvores e colocar armadilhas no caminho de seus inimigos.'
-          case 'Prist':
+          case 'Priest':
             return 'Os sacerdotes são devotos da espiritualidade e expressam sua resoluta fé ao prestar serviços para o povo. Há milhares de anos, estes indivíduos abandonam os confins de seus templos e todo o conforto para apoiar seus aliados em terras devastadas pela guerra. Nenhum herói questiona os valores da ordem dos sacerdotes no meio de uma terrível batalha.'
           case 'Shaman':
             return 'Os xamãs são os guias espirituais, não do poder divino, mas das forças dos elementos. Diferentes de outros místicos, os xamãs entram em comunhão com forças que não são sempre benevolentes. Os elementos são caóticos e, livres, constantemente entram em choque uns com os outros em um ciclo de fúria primitiva interminável. É o chamado do xamã que traz equilíbrio a este caos. Atuando como mediadores entre a terra, fogo, água e ar, os xamãs evocam totens que guiam os elementos a ajudarem seus aliados e castigar aqueles que os ameaçam.'
@@ -60,7 +60,7 @@
             return 'Os paladinos enfrentam os inimigos de frente, contando com armaduras pesadas e cura para sobreviver na batalha. Seja com escudos massivos ou armas devastadoras de duas mãos, os paladinos são capazes de manter garras e espadas distantes de seus aliados mais fracos ou usar magias de cura para certificar que eles continuem de pé.'
           case 'Hunter':
             return 'Os caçadores enfrentam os inimigos a distância ou de perto, ordenando que seus ajudantes ataquem enquanto atiram flechas, disparam suas armas ou desferem ataques com armas de haste. Mesmo com armamentos eficazes a curta e longa distância, os caçadores também são muito ágeis. Eles são capazes de fugir ou aprisionar os inimigos para controlar a arena de batalha.'
-          case 'Prist':
+          case 'Priest':
             return 'Os sacerdotes usam magias de cura poderosas para se fortalecerem e também seus aliados. Eles contam com feitiços potentes de ataque à distância, porém os inimigos são capazes de surpreendê-los devido ao uso de pouca armadura. Sacerdotes experientes usam seus poderes ofensivos com cuidado quando são apontados com a tarefa de manter seu grupo com vida.'
           case 'Shaman':
             return 'Quando estão em combate, os xamãs posicionam totens de dano e controle no chão para maximizar sua eficiência enquanto minam as ações do adversário. Xamãs são versáteis o suficiente para lutar corpo a corpo ou à distância contra seus adversários, porém os mais sábios adequam seu plano de ataque de acordo com as forças e fraquezas de seus inimigos.'

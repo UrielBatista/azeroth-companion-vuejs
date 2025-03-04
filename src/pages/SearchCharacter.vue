@@ -43,6 +43,9 @@
       </form>
     </div>
 
+    <!-- Uso do componente ErrorModal -->
+    <ErrorModal :is-visible="showModal" @close="closeModal" />
+
     <footer class="footer">
       <a href="https://github.com/UrielBatista/azeroth-companion-vuejs" target="_blank" class="footer-link">Open Source Project</a>
     </footer>
@@ -51,9 +54,13 @@
 
 <script>
 import axios from 'axios';
+import ErrorModal from '../components/ErrorModal.vue';
 
 export default {
   name: 'SearchCharacter',
+  components: {
+    ErrorModal,
+  },
   data() {
     return {
       username: '',
@@ -115,7 +122,8 @@ export default {
       filteredReigns: [],
       isMuted: true,
       highlightedIndex: -1,
-      submitted: false
+      submitted: false,
+      showModal: false
     };
   },
   mounted() {
@@ -138,6 +146,13 @@ export default {
       }
 
       await this.fetchNewToken();
+    },
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.submitted = false;
     },
     async fetchNewToken() {
       try {
@@ -256,8 +271,7 @@ export default {
         this.submitted = false;
       } catch (error) {
         if (error.status === 404){
-          alert("Personagem não existe ou disabilitado para buscas");
-          this.submitted = false;
+          this.openModal();
         } else {
         console.error("Erro ao buscar personagem:", error);
         alert("Erro ao buscar personagem");

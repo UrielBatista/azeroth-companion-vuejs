@@ -6,8 +6,8 @@
   </video>
 
   <div class="overlay"></div>
-
-  <div class="profile-container">
+  <transition name="fade">
+    <div class="profile-container">
     <h1>{{ name }}-{{ realm }}</h1>
     <character-details :details="characterInfo" />
 
@@ -54,18 +54,22 @@
           <h3>PvP</h3>
           <ul class="pvp-grid">
             <li class="pvp-item">
+              <div class="pvp-overlay"></div>
               <img :src="getBrasaoImage(pvp2s.rating)" class="pvp-icon" />
               <div class="pvp-value">{{ pvp2s.rating }}</div>
               <div class="pvp-label">Wins: {{ pvp2s.season_match_statistics.won }}</div>
               <div class="pvp-label">Lost: {{ pvp2s.season_match_statistics.lost }}</div>
               <div class="pvp-label">Played: {{ pvp2s.season_match_statistics.played }}</div>
+              <div class="pvp-rank-label">2x2</div>
             </li>
             <li class="pvp-item">
+              <div class="pvp-overlay"></div>
               <img :src="getBrasaoImage(pvp3s.rating)" class="pvp-icon" />
               <div class="pvp-value">{{ pvp3s.rating }}</div>
               <div class="pvp-label">Wins: {{ pvp3s.season_match_statistics.won }}</div>
               <div class="pvp-label">Lost: {{ pvp3s.season_match_statistics.lost }}</div>
               <div class="pvp-label">Played: {{ pvp3s.season_match_statistics.played }}</div>
+              <div class="pvp-rank-label">3x3</div>
             </li>
           </ul>
         </div>
@@ -129,6 +133,7 @@
               Select options above to get AI recommendations
             </div>
           </div>
+          <button @click="goBack" class="btn-back">Exit</button>
         </div>
       </div>
     </div>
@@ -144,6 +149,7 @@
       @close="showArmorModal = false" 
     />
   </div>
+</transition>
 </div>
 </template>
 
@@ -300,6 +306,28 @@ export default {
     if (savedTime) {
       this.lastSearchTime = parseInt(savedTime);
       this.updateCooldownTimer();
+    }
+  },
+  watch: {
+    '$route.query'(newQuery, oldQuery) {
+      // Verifica se houve mudança significativa nos parâmetros relevantes
+      if (newQuery.name !== oldQuery.name || newQuery.realm !== oldQuery.realm || newQuery.realmPath !== oldQuery.realmPath || newQuery.image !== oldQuery.image) {
+        this.name = newQuery.name || 'Unknown';
+        this.realm = newQuery.realm || 'Unknown';
+        this.realmPath = newQuery.realmPath || 'Unknown';
+        this.imageArmor = newQuery.image || '';
+
+        // Recarrega os dados do personagem
+        this.fetchCharacterData();
+        this.fetchEquipaments();
+        this.fetchStats();
+        this.fetchPvPBracket();
+        this.fetchAlts();
+
+        // Verifica as imagens novamente
+        this.checkImageLoaded();
+        this.loadBackgroundImage();
+      }
     }
   },
   methods: {
@@ -952,6 +980,63 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
 }
 
+:root {
+  --gold-gradient: linear-gradient(135deg, #c9b37f 0%, #bda65b 100%);
+  --shadow-glow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  --shadow-hover: 0 6px 25px rgba(255, 215, 0, 0.5);
+  --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-back {
+  position: absolute;
+  inset: 1rem 1rem auto auto;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: none;
+  border: none;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: var(--transition-all);
+  text-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+  z-index: 2;
+}
+
+.btn-back:hover {
+  transform: translateY(-3px) scale(1.05);
+  text-shadow: 0 4px 20px rgba(255, 215, 0, 0.8);
+  color: #fff;
+}
+
+.btn-back:active {
+  transform: scale(0.95);
+}
+
+/* Animação de entrada */
+.btn-back {
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-back {
+    inset: 0.75rem 0.75rem auto auto;
+  }
+}
+
 .cooldown-timer {
   margin-top: 0.5rem;
   color: #c9b37f;
@@ -1005,22 +1090,82 @@ input:checked + .toggle-slider:before {
   z-index: -1;
 }
 
-.pvp-item:hover {
+.pvp-item:hover,
+.pvp-item:active {
   transform: translateY(-5px) scale(1.03);
   box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+}
+
+.pvp-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0); /* Inicialmente transparente */
+  transition: background 0.3s ease;
+  z-index: 1;
+  pointer-events: none; /* Permite interação com o item abaixo */
+}
+
+.pvp-item:hover .pvp-overlay,
+.pvp-item:active .pvp-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.pvp-item:hover .pvp-icon,
+.pvp-item:active .pvp-icon {
+  filter: brightness(0.8);
+}
+
+.pvp-rank-label {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.932), rgba(92, 92, 92, 0.808));
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem; 
+  font-weight: bold;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.185);
+  z-index: 3;
+  opacity: 0;
+  transition: bottom 0.4s ease, opacity 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
 .pvp-icon {
   width: 100px;
   height: 100px;
   margin-bottom: 1rem;
-  z-index: 1;
+  z-index: 2;
+  transition: filter 0.3s ease;
 }
 
-.pvp-value, .pvp-label {
+.pvp-value,
+.pvp-label {
   color: #ffffff;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-  z-index: 1;
+  z-index: 2;
+  transition: color 0.3s ease;
+}
+
+.pvp-item:hover .pvp-value,
+.pvp-item:hover .pvp-label,
+.pvp-item:active .pvp-value,
+.pvp-item:active .pvp-label {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .pvp-value {
@@ -1032,6 +1177,24 @@ input:checked + .toggle-slider:before {
 .pvp-label {
   font-size: 1rem;
   margin-bottom: 0.3rem;
+}
+
+.pvp-item:hover .pvp-rank-label,
+.pvp-item:active .pvp-rank-label {
+  bottom: 0;
+  opacity: 1;
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+@keyframes slideUp {
+  0% {
+    bottom: -30px;
+    opacity: 0;
+  }
+  100% {
+    bottom: 10px;
+    opacity: 1;
+  }
 }
 
 .stat-value {
@@ -1055,7 +1218,7 @@ input:checked + .toggle-slider:before {
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
-  margin: 2rem auto; /* Centraliza no fluxo do layout */
+  margin: 2rem auto;
 }
 
 @keyframes fadeIn {
