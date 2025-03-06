@@ -21,7 +21,7 @@
           <div class="alt-info">
             <h3>{{ alt.name }} - {{ alt.realm }}</h3>
             <p>Class: {{ getClassName(alt.class) }}</p>
-            <p>Level: {{ alt.level }}</p>
+            <!-- <p>Level: {{ alt.level }}</p> -->
           </div>
         </div>
       </transition-group>
