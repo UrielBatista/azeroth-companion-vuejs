@@ -106,8 +106,6 @@ export default {
   },
   methods: {
     async handleClick(name, realm) {
-      console.log(name, realm);
-
       try {
         const token = localStorage.getItem('access_token');
         const searchUsername = name.toLowerCase();
