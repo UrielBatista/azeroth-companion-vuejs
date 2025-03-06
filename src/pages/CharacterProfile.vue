@@ -207,6 +207,8 @@ export default {
       realm: this.$route.query.realm || 'Unknown',
       realmPath: this.$route.query.realmPath || 'Unknow',
       imageArmor: this.$route.query.image || '',
+      classId: 0,
+      level: 0,
       equipaments: null,
       stats: null,
       pvp2s: null,
@@ -299,7 +301,6 @@ export default {
     this.fetchPvPBracket();
     this.loadBackgroundImage();
     this.checkImageLoaded();
-    this.fetchAlts();
     // window.history.pushState({}, document.title, this.$route.path);
 
     const savedTime = localStorage.getItem('lastSearchTime');
@@ -322,7 +323,6 @@ export default {
         this.fetchEquipaments();
         this.fetchStats();
         this.fetchPvPBracket();
-        this.fetchAlts();
 
         // Verifica as imagens novamente
         this.checkImageLoaded();
@@ -345,6 +345,24 @@ export default {
           this.backgroundLoaded = true;
         };
       }
+    },
+    getClassId(className) {
+      const classMap = {
+        'Warrior': 1,
+        'Paladin': 2,
+        'Hunter': 3,
+        'Rogue': 4,
+        'Priest': 5,
+        'Death Knight': 6,
+        'Shaman': 7,
+        'Mage': 8,
+        'Warlock': 9,
+        'Monk': 10,
+        'Druid': 11,
+        'Demon Hunter': 12,
+        'Evoker': 13,
+      };
+      return classMap[className] || 'Unknown';
     },
     checkImageLoaded() {
       const img = new Image();
@@ -435,7 +453,9 @@ export default {
       try {
         const realmParam = this.realm;
         const nameParam = this.name;
-        const url = `https://scrapping-python-alts-production.up.railway.app/alts/${realmParam}/${nameParam}`;
+
+        const url = `http://127.0.0.1:8000/alts/${this.level}/${this.classId}/${realmParam}/${nameParam}`;
+        
         const response = await axios.get(url);
         this.alts = response.data.data.alts;
         this.isLoadingAlts = false;
@@ -456,12 +476,17 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
         
+        this.level = response.data.level || this.$route.query.level || 0;
+        this.classId = this.getClassId(response.data.character_class.name);
+        
         this.updateCharacterData(response.data);
+        await this.fetchAlts();
       } catch (error) {
         console.error('Erro ao buscar dados do personagem:', error);
         this.name = this.$route.query.name || 'Unknown';
         this.realm = this.$route.query.realm || 'Unknown';
         this.level = this.$route.query.level || 0;
+        await this.fetchAlts();
       }
     },
     async fetchEquipaments() {
