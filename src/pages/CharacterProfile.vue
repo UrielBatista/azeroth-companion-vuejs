@@ -652,6 +652,7 @@ h1 {
 }
 
 .image-container {
+  cursor: pointer;
   width: 850px;
   height: 600px;
   max-width: 90vw;

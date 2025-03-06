@@ -259,6 +259,7 @@ export default {
 
 /* Estilização do card */
 .alt-card {
+  cursor: pointer;
   background-image: url('@/assets/warrior-background.webp');
   background-size: cover;
   background-position: center;
