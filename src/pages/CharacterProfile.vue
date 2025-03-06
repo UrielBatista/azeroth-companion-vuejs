@@ -454,7 +454,7 @@ export default {
         const realmParam = this.realm;
         const nameParam = this.name;
 
-        const url = `http://127.0.0.1:8000/alts/${this.level}/${this.classId}/${realmParam}/${nameParam}`;
+        const url = `https://scrapping-python-alts-production.up.railway.app/alts/${this.level}/${this.classId}/${realmParam}/${nameParam}`;
         
         const response = await axios.get(url);
         this.alts = response.data.data.alts;
