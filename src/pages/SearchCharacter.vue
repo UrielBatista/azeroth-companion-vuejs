@@ -39,7 +39,10 @@
             </li>
           </ul>
         </div>
-        <button type="submit" class="btn-login">Search</button>
+        <button type="submit" class="btn-login" :disabled="isLoading">
+          <span v-if="!isLoading">Search</span>
+          <span v-else class="spinner"></span>
+        </button>
       </form>
     </div>
 
@@ -123,7 +126,8 @@ export default {
       isMuted: true,
       highlightedIndex: -1,
       submitted: false,
-      showModal: false
+      showModal: false,
+      isLoading: false
     };
   },
   mounted() {
@@ -240,8 +244,11 @@ export default {
     async handleLogin() {
       if (!this.username.trim() || !this.reign.trim()) {
         alert("Please fill in both Character Name and Reign fields.");
+        return;
       }
 
+      this.isLoading = true;
+      this.submitted = true;
       try {
         const token = localStorage.getItem('access_token');
         const searchUsername = this.username.trim().toLowerCase();
@@ -272,10 +279,12 @@ export default {
       } catch (error) {
         if (error.status === 404){
           this.openModal();
+          this.isLoading = false;
         } else {
         console.error("Erro ao buscar personagem:", error);
         alert("Erro ao buscar personagem");
         this.submitted = false;
+        this.isLoading = false;
         }
       }
     }
@@ -489,6 +498,30 @@ html, body {
 
 .footer-link:hover {
   color: #ffd700;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 215, 0, 0.3);
+  border-radius: 50%;
+  border-top-color: gold;
+  animation: spin 1s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+.btn-login:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 480px) {

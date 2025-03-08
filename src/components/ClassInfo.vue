@@ -1,137 +1,137 @@
 <template>
-    <div class="class-info-container">
-      <h2>Informações da Classe</h2>
-      <p class="class-description">{{ classDescription }}</p>
-      <h3>Estratégia de Combate</h3>
-      <p class="combat-strategy">{{ combatStrategy }}</p>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'ClassInfo',
-    props: {
-      classType: {
-        type: String,
-        required: true,
-        default: 'Rogue'
+  <div class="class-info-container">
+    <h2>Class Information</h2>
+    <p class="class-description">{{ classDescription }}</p>
+    <h3>Combat Strategy</h3>
+    <p class="combat-strategy">{{ combatStrategy }}</p>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'ClassInfo',
+  props: {
+    classType: {
+      type: String,
+      required: true,
+      default: 'Rogue'
+    }
+  },
+  computed: {
+    classDescription() {
+      switch (this.classType) {
+        case 'Rogue':
+          return 'For rogues, the only code is the contract, and their honor can be bought with gold. Free from scruples, these mercenaries employ brutal and efficient tactics. Lethal assassins and masters of stealth, rogues approach their targets from behind, pierce a vital organ, and vanish into the shadows before the victim hits the ground.';
+        case 'Warrior':
+          return 'Wars come and go, but some heroes dedicate themselves tirelessly to mastering every aspect of the art of battle. Warriors combine strength, leadership, and vast knowledge of weapons and armor to wreak havoc on the battlefield. Some hold the front line with shields, keeping enemies at bay while their allies support with spells and ranged attacks. Others forgo shields and unleash their fury on the nearest threat, wielding a wide array of lethal weapons.';
+        case 'Paladin':
+          return 'This is the paladin’s duty: to protect the weak, bring justice to the unjust, and eradicate evil from the darkest corners of the world. These holy warriors are equipped with plate armor to face the toughest foes and wield the blessings of the Light, allowing them to heal wounds and, in some cases, even resurrect the dead.';
+        case 'Hunter':
+          return 'From an early age, the call of the wild draws some adventurers to abandon the comfort of their homes and venture into the unforgiving wilderness. Those who survive become hunters. Masters of their domain, hunters can glide like ghosts through the trees and set traps in their enemies’ paths.';
+        case 'Priest':
+          return 'Priests are devoted to spirituality and express their unwavering faith by serving the people. For thousands of years, these individuals have left the confines of their temples and all comforts to support their allies in war-torn lands. No hero questions the value of the priestly order amidst a fierce battle.';
+        case 'Shaman':
+          return 'Shamans are spiritual guides, not of divine power, but of the elemental forces. Unlike other mystics, shamans commune with forces that are not always benevolent. The elements are chaotic and, when left unchecked, constantly clash in an endless cycle of primal fury. It is the shaman’s call to bring balance to this chaos. Acting as mediators between earth, fire, water, and air, shamans summon totems that direct the elements to aid their allies and punish those who threaten them.';
+        case 'Mage':
+          return 'Students gifted with keen intellect and unshakable discipline may tread the path of the mage. The arcane magic at a mage’s disposal is both wondrous and dangerous, and thus its secrets are revealed only to the most devoted practitioners. To prevent interference with their spellcasting, mages wear cloth armor, but arcane shields and enchantments provide additional protection. To keep enemies at bay, mages can summon bursts of fire to incinerate targets and trigger eruptions across entire areas, setting groups ablaze.';
+        case 'Warlock':
+          return 'Faced with demonic powers, most heroes see death. Warlocks see only opportunity. Domination is their goal, and they have found a path to it through mastery of the dark arts. To aid their schemes, these sorcerers summon monstrous minions to fight by their side. Early in their journey, warlocks command only imps, but over time, new allies like seductive succubi, chaotic voidwalkers, and ferocious felhunters join them to crush any threat.';
+        case 'Monk':
+          return 'When the pandaren were subjugated by the mogu centuries ago, monks rekindled hope in a seemingly bleak future. With weapons out of reach, the enslaved pandaren turned to focusing their chi and developed unarmed combat techniques. When the opportunity for revolution arose, they were already trained to topple their oppressors.';
+        case 'Druid':
+          return 'Druids harness the vast powers of nature to preserve balance and protect life. A skilled druid can unleash nature’s raw energy, raining celestial wrath upon enemies from afar, binding them with enchanted roots, or ensnaring them in relentless cyclones.';
+        case 'Demon Hunter':
+          return 'Demon Hunters, disciples of Illidan Stormrage, uphold a dark legacy that terrifies both foes and allies alike. The Illidari wield chaotic and fel magic—energies that have long threatened Azeroth—believing them essential to defeating the Burning Legion. By embracing the powers of the demons they slay, demon hunters develop fiendish traits that inspire fear and disdain among other elves.';
+        case 'Death Knight':
+          return 'When the Lich King’s hold over his death knights broke, his former champions found new purpose as Knights of the Ebon Blade. After donning the helm to contain the Scourge undead, Bolvar Fordragon raised a new generation of death knights to champion the Ebon Blade’s cause.';
+        case 'Evoker':
+          return 'Dracthyr Evokers were created to wield the magic of all five dragonflights and seek to forge their own path in Azeroth. They enhance their draconic abilities through magic and can charge their attacks to unleash them at the perfect moment with devastating effect. They can also use their superior mobility to weave in and out of combat as needed.';
+        default:
+          return 'Class description not available.';
       }
     },
-    computed: {
-      classDescription() {
-        switch (this.classType) {
-          case 'Rogue':
-            return 'Para os ladinos, o único código que existe é o contrato e sua honra pode ser comprada com ouro. Livres de escrúpulos, estes mercenários empregam o uso de táticas brutais e eficientes. Assassinos letais e mestres da furtividade, os ladinos aproximam-se de seus alvos pela retaguarda, perfuram um órgão vital e desaparecem nas sombras antes da vítima cair no chão.';
-          case 'Warrior':
-            return 'Guerras vêm e vão, mas há heróis que se dedicam a dominar todos os aspectos da arte da batalha sem descanso. Guerreiros combinam força, liderança e vasto conhecimento em armas e armaduras para criar o caos no campo de batalha. Alguns protegem a linha de frente com escudos, segurando o inimigo enquanto seus aliados os auxiliam com feitiços e disparos. Outros deixam o escudo de lado e liberam sua fúria na ameaça mais próxima contando com uma grande variedade de armas letais.'
-          case 'Paladin':
-            return 'Este é o dever do paladino: proteger os fracos, trazer justiça aos injustos e exterminar o mal nos confins mais sombrios do mundo. Estes guerreiros sagrados estão equipados com armaduras de placas para enfrentar os inimigos mais perigosos e são adeptos da benção da Luz que lhes permite curar feridas, e em alguns casos, ressuscitar os mortos.'
-          case 'Hunter':
-            return 'Desde cedo, o chamado das selvas incita alguns aventureiros a deixarem a comodidade de seus lares para adentrarem o impiedoso mundo selvagem. Aqueles que sobrevivem acabam se tornando caçadores. Senhores de seu domínio, os caçadores são capazes de deslizar como fantasmas por entre as árvores e colocar armadilhas no caminho de seus inimigos.'
-          case 'Priest':
-            return 'Os sacerdotes são devotos da espiritualidade e expressam sua resoluta fé ao prestar serviços para o povo. Há milhares de anos, estes indivíduos abandonam os confins de seus templos e todo o conforto para apoiar seus aliados em terras devastadas pela guerra. Nenhum herói questiona os valores da ordem dos sacerdotes no meio de uma terrível batalha.'
-          case 'Shaman':
-            return 'Os xamãs são os guias espirituais, não do poder divino, mas das forças dos elementos. Diferentes de outros místicos, os xamãs entram em comunhão com forças que não são sempre benevolentes. Os elementos são caóticos e, livres, constantemente entram em choque uns com os outros em um ciclo de fúria primitiva interminável. É o chamado do xamã que traz equilíbrio a este caos. Atuando como mediadores entre a terra, fogo, água e ar, os xamãs evocam totens que guiam os elementos a ajudarem seus aliados e castigar aqueles que os ameaçam.'
-          case 'Mage':
-            return 'Estudantes privilegiados com intelecto aguçado e disciplina inabalável podem seguir o caminho do mago. A magia arcana que os magos têm à sua disposição é igualmente incrível como perigosa e por isso seus segredos são revelados apenas para os praticantes mais devotados. Para impedir qualquer tipo de interferência com o lançamento de suas magias, os magos usam armaduras de tecido, porém seus escudos arcanos e encantamentos lhes fornecem proteção adicional. Para manter os inimigos à distância, os magos são capazes de evocar rajadas de fogo para incinerar alvos e causar erupções em áreas inteiras para colocar grupos inteiros em chamas.'
-          case 'Warlock':
-            return 'Frente a poderes demoníacos, a maioria dos heróis vê a morte. Bruxos veem apenas oportunidades. Dominação é seu objetivo e o caminho encontrado para isso está no controle das artes sombrias. Para auxiliá-los em seus planos, tais feiticeiros evocam ajudantes monstruosos para lutarem ao seu lado. No início da jornada, os bruxos contam apenas com diabretes sob seu comando, mas com o tempo novos ajudantes entram em cena, como súcubos sedutoras, emissários do caos e vis selvagens para acabar com qualquer ameaça.'
-          case 'Monk':
-            return 'Quando os pandarens foram dominados pelos mogu, séculos atrás, os monges resgataram a esperança em um futuro que parecia sombrio. Com armas fora de seu alcance, os pandarens escravizados passaram a praticar a concentração de chi e desenvolveram técnicas de combate sem armas. Quando a oportunidade para iniciar a revolução apareceu, eles já estavam treinados para derrubar a força opressora.'
-          case 'Druid':
-            return 'Os druidas tiram proveito dos vastos poderes da natureza para preservar o equilíbrio e proteger a vida. Um druida experiente pode extrair a energia bruta da natureza, descarregando fúria celestial contra seus inimigos de grandes distâncias, imobilizando-os com raízes encantadas ou retardá-los em ciclones impiedosos.'
-          case 'Demon Hunter':
-            return 'Os Caçadores de Demônios, discípulos de Illidan Tempesfúria, representam um legado sombrio que amedronta tanto os inimigos quanto os aliados. Os Illidari utilizam magia caótica e vil — energias que há muito ameaçam o mundo de Azeroth — pois creem que ela é essencial para derrotar a Legião Ardente. Ao usar os poderes dos demônios que matam, os caçadores desenvolvem características demoníacas que incutem temor e desprezo nos outros elfos.'
-          case 'Death Knight':
-            return 'Quando o controle do Lich Rei sobre os cavaleiros da morte cessou, seus antigos campeões encontraram um novo propósito como Cavaleiros da Lâmina de Ébano. Após vestir o elmo a fim de conter o Flagelo dos mortos-vivos, Bolvar Fordragon reuniu uma nova geração de cavaleiros da morte para defender a causa da Lâmina de Ébano.'
-          case 'Evoker':
-            return 'Os Conjurantes Dracthyrs foram criados para brandir a magia de todas as cinco revoadas dragônicas e querem forjar seu próprio caminho em Azeroth. Eles potencializam suas habilidades dracônicas através de magia e podem carregar os ataques para liberá-los no momento certo, com efeitos devastadores. Podem também usar sua mobilidade superior para entrar e sair de confrontos conforme precisarem.'
-          default:
-            return 'Descrição da classe não disponível.';
-        }
-      },
-      combatStrategy() {
-        switch (this.classType) {
-          case 'Rogue':
-            return 'Os ladinos geralmente iniciam o combate com um ataque surpresa vindo das sombras seguido de golpes corpo a corpo brutais. Em batalhas prolongadas, eles utilizam-se de combinações de ataques sucessivos que abrem caminho para o golpe de misericórdia. Os ladinos, porém, devem escolher seus alvos com cautela para não desperdiçarem seus combos. Além disso, eles devem ser espertos para saber quando se esconder ou fugir de uma batalha que não está mais em seu favor.';
-          case 'Warrior':
-            return 'Guerreiros se equipam bem para o combate e encaram os inimigos de frente, deixando a armadura pesada aparar os ataques deles. Empregam diversas estratégias de combate e vários tipos de arma para proteger os aliados mais vulneráveis. Eles precisam gerenciar muito bem a raiva, que alimenta seus ataques mais poderosos, para maximizar sua efetividade em combate.'
-          case 'Paladin':
-            return 'Os paladinos enfrentam os inimigos de frente, contando com armaduras pesadas e cura para sobreviver na batalha. Seja com escudos massivos ou armas devastadoras de duas mãos, os paladinos são capazes de manter garras e espadas distantes de seus aliados mais fracos ou usar magias de cura para certificar que eles continuem de pé.'
-          case 'Hunter':
-            return 'Os caçadores enfrentam os inimigos a distância ou de perto, ordenando que seus ajudantes ataquem enquanto atiram flechas, disparam suas armas ou desferem ataques com armas de haste. Mesmo com armamentos eficazes a curta e longa distância, os caçadores também são muito ágeis. Eles são capazes de fugir ou aprisionar os inimigos para controlar a arena de batalha.'
-          case 'Priest':
-            return 'Os sacerdotes usam magias de cura poderosas para se fortalecerem e também seus aliados. Eles contam com feitiços potentes de ataque à distância, porém os inimigos são capazes de surpreendê-los devido ao uso de pouca armadura. Sacerdotes experientes usam seus poderes ofensivos com cuidado quando são apontados com a tarefa de manter seu grupo com vida.'
-          case 'Shaman':
-            return 'Quando estão em combate, os xamãs posicionam totens de dano e controle no chão para maximizar sua eficiência enquanto minam as ações do adversário. Xamãs são versáteis o suficiente para lutar corpo a corpo ou à distância contra seus adversários, porém os mais sábios adequam seu plano de ataque de acordo com as forças e fraquezas de seus inimigos.'
-          case 'Mage':
-            return 'Os magos destroem seus adversários com o uso de conjurações arcanas. Apesar de dominarem poderosas magias ofensivas, os magos são frágeis e usam armaduras leves deixando-os particularmente vulneráveis contra ataques corpo a corpo. Os magos mais sábios utilizam suas magias com cautela para manter seus inimigos sempre distantes e imobilizados.'
-          case 'Warlock':
-            return 'Os bruxos incineram e destroem seus inimigos ao utilizar combinações de pragas debilitantes e magia negra. Enquanto companheiros demoníacos ajudantes os protegem e lhes garantem benefícios, os bruxos atacam seus inimigos à distância. Tais feiticeiros possuem armaduras leves e são frágeis fisicamente, por isso os mais sábios deixam seus lacaios receberem a maioria dos ataques inimigos para salvar a própria pele.'
-          case 'Monk':
-            return 'Seja qual for sua função em combate, os monges recorrem principalmente às mãos, aos pés e a uma ligação profunda com o próprio chi para fortalecer suas habilidades. Monges também podem curar os aliados e, ao mesmo tempo, causar dano aos inimigos.'
-          case 'Druid':
-            return 'Os druidas são combatentes versáteis e capazes de atuar em quase todas as funções: curador, tanque ou causador de danos. É fundamental que os druidas adaptem seu estilo de acordo com a situação atual da batalha já que cada uma das funções tem um propósito específico.'
-          case 'Demon Hunter':
-            return 'Os Caçadores de Demônios desprezam as armaduras pesadas e preferem a velocidade, aproximando-se rapidamente para cortar inimigos com armas de uma mão. Mas os Illidari também precisam usar essa agilidade de forma defensiva para que as batalhas terminem a seu favor.'
-          case 'Death Knight':
-            return 'Os cavaleiros da morte enfrentam seus adversários com ataques corpo a corpo, complementando os golpes de suas armas com magias negras que deixam os inimigos vulneráveis ou causam danos com poder profano. Eles atraem os inimigos para batalhas um a um, evitando-os de atacar seus aliados mais fracos. Para impedir que os adversários fujam de seu alcance, os cavaleiros da morte devem sempre ficar atentos aos poderes que evocam das runas e adotar o ritmo adequado para seus ataques.'
-          case 'Evoker':
-            return 'Conjurantes têm habilidades especiais potencializadas que podem ser usadas para alterar a força do feitiço ou habilidade que estão lançando. Conjurantes Sábios podem tirar proveito desses feitiços potencializados e lutar a uma distância média, torrando os inimigos com sopros flamejantes ou curando aliados para mantê-los na briga.'
-          default:
-            return 'Descrição da classe não disponível.';
-        }
+    combatStrategy() {
+      switch (this.classType) {
+        case 'Rogue':
+          return 'Rogues typically initiate combat with a surprise attack from the shadows, followed by brutal melee strikes. In prolonged battles, they rely on combinations of successive attacks that set up a finishing blow. However, rogues must choose their targets carefully to avoid wasting their combos. They must also be cunning enough to know when to hide or flee from a fight that turns against them.';
+        case 'Warrior':
+          return 'Warriors gear up thoroughly for combat and face enemies head-on, letting heavy armor absorb their blows. They employ various combat strategies and weapon types to protect vulnerable allies. Warriors must manage their rage, which fuels their most powerful attacks, to maximize their effectiveness in battle.';
+        case 'Paladin':
+          return 'Paladins confront enemies head-on, relying on heavy armor and healing to survive combat. Whether with massive shields or devastating two-handed weapons, paladins can keep claws and blades away from weaker allies or use healing spells to ensure they stay standing.';
+        case 'Hunter':
+          return 'Hunters engage enemies from afar or up close, commanding their pets to attack while firing arrows, shooting guns, or striking with pole weapons. Though equipped with effective short- and long-range tools, hunters are also highly agile. They can escape or trap enemies to control the battlefield.';
+        case 'Priest':
+          return 'Priests use powerful healing spells to bolster themselves and their allies. They wield potent ranged attack spells, but enemies can catch them off guard due to their light armor. Skilled priests carefully balance their offensive powers when tasked with keeping their group alive.';
+        case 'Shaman':
+          return 'In combat, shamans place damage and control totems on the ground to maximize efficiency while thwarting enemy actions. Shamans are versatile enough to fight in melee or at range, but the wisest adapt their attack plan based on their enemies’ strengths and weaknesses.';
+        case 'Mage':
+          return 'Mages obliterate their foes with arcane spellcasting. Though they wield powerful offensive magic, mages are fragile and wear light armor, leaving them particularly vulnerable to melee attacks. Wise mages use their spells cautiously to keep enemies at a distance and immobilized.';
+        case 'Warlock':
+          return 'Warlocks burn and destroy enemies by combining debilitating curses with dark magic. While demonic minions protect them and provide benefits, warlocks strike from afar. With light armor and physical frailty, the wisest warlocks let their minions take most enemy attacks to preserve themselves.';
+        case 'Monk':
+          return 'Whatever their combat role, monks rely primarily on their hands, feet, and a deep connection to their chi to enhance their abilities. Monks can also heal allies while simultaneously dealing damage to enemies.';
+        case 'Druid':
+          return 'Druids are versatile fighters capable of filling nearly any role: healer, tank, or damage dealer. It’s crucial for druids to adapt their style to the current battle situation, as each role serves a specific purpose.';
+        case 'Demon Hunter':
+          return 'Demon Hunters eschew heavy armor in favor of speed, closing in quickly to slash enemies with one-handed weapons. However, the Illidari must also use this agility defensively to ensure battles end in their favor.';
+        case 'Death Knight':
+          return 'Death knights face foes with melee attacks, supplementing their weapon strikes with dark magic that weakens enemies or deals damage with unholy power. They draw enemies into one-on-one fights, preventing them from targeting weaker allies. To keep foes within reach, death knights must stay mindful of the powers they draw from runes and maintain the right rhythm for their attacks.';
+        case 'Evoker':
+          return 'Evokers have special empowered abilities that can be charged to alter the strength of the spell or ability they’re casting. Wise evokers leverage these empowered spells, fighting at medium range, scorching enemies with fiery breaths or healing allies to keep them in the fight.';
+        default:
+          return 'Class description not available.';
       }
     }
   }
-  </script>
-  
+}
+</script>
+
 <style scoped>
 .class-info-container {
-  font-family: 'Cinzel', serif;
-  background-size: cover;
-  background-position: center;
-  padding: 2rem;
-  border-radius: 12px;
-  color: #ffffff;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.6); /* Overlay semi-transparente */
-  backdrop-filter: blur(8px) saturate(180%);
-  -webkit-backdrop-filter: blur(8px) saturate(180%);
-  border: 2px solid #c9b37f; /* Borda dourada */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 0 10px rgba(201, 179, 127, 0.5);
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 800px;
-  position: relative;
-  overflow: hidden;
-  animation: fadeIn 1s ease-in-out;
+font-family: 'Cinzel', serif;
+background-size: cover;
+background-position: center;
+padding: 2rem;
+border-radius: 12px;
+color: #ffffff;
+text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+background: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+backdrop-filter: blur(8px) saturate(180%);
+-webkit-backdrop-filter: blur(8px) saturate(180%);
+border: 2px solid #c9b37f; /* Golden border */
+box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 0 10px rgba(201, 179, 127, 0.5);
+margin-top: 2rem;
+width: 100%;
+max-width: 800px;
+position: relative;
+overflow: hidden;
+animation: fadeIn 1s ease-in-out;
 }
 
 h2 {
-  font-size: 1.8rem;
-  color: #c9b37f;
-  margin-bottom: 1rem;
-  text-align: center;
-  text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+font-size: 1.8rem;
+color: #c9b37f;
+margin-bottom: 1rem;
+text-align: center;
+text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
 
 h3 {
-  font-size: 1.4rem;
-  color: #c9b37f;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  text-align: center;
+font-size: 1.4rem;
+color: #c9b37f;
+margin-top: 1.5rem;
+margin-bottom: 0.5rem;
+text-align: center;
 }
 
 .class-description,
 .combat-strategy {
-  font-size: 1rem;
-  line-height: 1.5;
-  text-align: left; /* Alterado de justify para left */
-  hyphens: auto; /* Permite hifenização para palavras longas */
-  -webkit-hyphens: auto; /* Suporte para Webkit */
-  -moz-hyphens: auto; /* Suporte para Firefox */
-  word-spacing: 0; /* Garante espaçamento padrão entre palavras */
+font-size: 1rem;
+line-height: 1.5;
+text-align: left; /* Changed from justify to left */
+hyphens: auto; /* Allows hyphenation for long words */
+-webkit-hyphens: auto; /* Webkit support */
+-moz-hyphens: auto; /* Firefox support */
+word-spacing: 0; /* Ensures default word spacing */
 }
 </style>
