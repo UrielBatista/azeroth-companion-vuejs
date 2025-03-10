@@ -1,61 +1,44 @@
 <template>
-      <!-- Campo de busca -->
-      <div class="search-container">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search by alt name..."
-          class="search-input"
-        />
-      </div>
-  
-      <!-- Grid de alts paginados com animação -->
-      <transition-group name="alt-list" tag="div" class="alts-grid">
-        <div
-          v-for="alt in paginatedAlts"
-          :key="alt.name + alt.realm"
-          class="alt-card"
-          @click="handleClick(alt.name, alt.realm)"
-          :style="{ backgroundImage: `url(${getBackground(alt.class)})` }"
-        >
-          <div class="alt-info">
-            <h3>{{ alt.name }} - {{ alt.realm }}</h3>
-            <p>Class: {{ getClassName(alt.class) }}</p>
-            <!-- <p>Level: {{ alt.level }}</p> -->
-          </div>
+  <!-- Campo de busca -->
+  <div class="search-container">
+    <input
+      v-model="searchQuery"
+      type="text"
+      placeholder="Search by alt name..."
+      class="search-input"
+    />
+  </div>
+
+  <!-- Grid de alts sem transition-group -->
+  <div class="alts-grid">
+    <!-- Ao mudar o key, o Flickity será recriado -->
+    <Flickity ref="flickity" :key="flickityKey" class="carousel">
+      <div
+        v-for="alt in filteredAlts"
+        :key="alt.name + alt.realm"
+        class="alt-card"
+        :style="{ backgroundImage: `url(${getBackground(alt.class)})` }"
+      >
+        <div class="alt-info">
+          <h3  @click="handleClick(alt.name, alt.realm)" class="clickable-name">
+            {{ alt.name }} - {{ alt.realm }}</h3>
+          <p>Class: {{ getClassName(alt.class) }}</p>
         </div>
-      </transition-group>
-  
-      <!-- Controles de paginação -->
-      <div class="pagination-container" v-if="filteredAlts.length > itemsPerPage">
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="pagination-btn"
-        >
-          Previous
-        </button>
-        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-          class="pagination-btn"
-        >
-          Next
-        </button>
       </div>
-  
-      <!-- Mensagem caso não haja resultados -->
-      <transition name="fade">
-        <p v-if="filteredAlts.length === 0" class="no-alts">
-          No alts found matching your search.
-        </p>
-      </transition>
+    </Flickity>
+  </div>
+
+  <!-- Mensagem caso não haja resultados -->
+  <transition name="fade">
+    <p v-if="filteredAlts.length === 0" class="no-alts">
+      No alts found matching your search.
+    </p>
+  </transition>
 </template>
 
 <script>
-
 import axios from 'axios';
+import Flickity from "vue-flickity";
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
@@ -83,10 +66,11 @@ export default {
   data() {
     return {
       searchQuery: '',
-      currentPage: 1,
-      itemsPerPage: 3,
       backgroundImage: '',
     };
+  },
+  components: {
+    Flickity,
   },
   computed: {
     filteredAlts() {
@@ -95,13 +79,9 @@ export default {
         alt.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
-    totalPages() {
-      return Math.ceil(this.filteredAlts.length / this.itemsPerPage);
-    },
-    paginatedAlts() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredAlts.slice(start, end);
+    flickityKey() {
+      // A key muda sempre que o valor do searchQuery ou o número de itens filtrados mudar
+      return `${this.searchQuery}-${this.filteredAlts.length}`;
     },
   },
   methods: {
@@ -130,13 +110,11 @@ export default {
         });
 
       } catch (error) {
-        if (error.status === 404){
-          alert("Personagem não existe ou disabilitado para buscas");
-          this.submitted = false;
+        if (error.status === 404) {
+          alert("Personagem não existe ou desabilitado para buscas");
         } else {
-        console.error("Erro ao buscar personagem:", error);
-        alert("Erro ao buscar personagem");
-        this.submitted = false;
+          console.error("Erro ao buscar personagem:", error);
+          alert("Erro ao buscar personagem");
         }
       }
     },
@@ -175,21 +153,6 @@ export default {
         13: dragonBackground, 
       };
       return backgroundMap[classId] || warriorBackground;
-    },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-      }
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-      }
-    },
-  },
-  watch: {
-    searchQuery() {
-      this.currentPage = 1;
     },
   },
 };
@@ -239,25 +202,9 @@ export default {
   gap: 1.5rem;
 }
 
-/* Animação para transição de cards */
-.alt-list-enter-active,
-.alt-list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.alt-list-enter-from,
-.alt-list-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.alt-list-move {
-  transition: transform 0.5s ease;
-}
-
 /* Estilização do card */
 .alt-card {
-  cursor: pointer;
+  cursor: grab;
   background-image: url('@/assets/warrior-background.webp');
   background-size: cover;
   background-position: center;
@@ -267,11 +214,13 @@ export default {
   border: 1px solid rgba(255, 215, 0, 0.25);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 215, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: block;
+  width: 66%;
+  height: 200px;
+  counter-increment: carousel-cell;
   position: relative;
   overflow: hidden;
+  margin: 0 1rem;
 }
 
 .alt-card::before {
@@ -299,29 +248,14 @@ export default {
   border-color: rgba(255, 215, 0, 0.5);
 }
 
-.alt-thumbnail {
-  width: 100%;
-  max-width: 160px;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 0.8rem;
-  z-index: 1;
-  transition: transform 0.3s ease;
-  position: relative;
-}
-
-.alt-card:hover .alt-thumbnail {
-  transform: scale(1.05);
-}
-
 .alt-info {
   text-align: center;
-  z-index: 1;
   position: relative;
+  z-index: 1;
 }
 
 .alt-info h3 {
-  font-size: 1.3rem;
+  font-size: 2.0rem;
   color: #c9b37f;
   margin-bottom: 0.6rem;
   font-family: 'Cinzel', serif;
@@ -333,8 +267,23 @@ export default {
   color: #ffd700;
 }
 
+/* Estilo do nome clicável */
+.clickable-name {
+  cursor: pointer;
+  font-size: 1.3rem;
+  color: #c9b37f;
+  margin-bottom: 0.6rem;
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  transition: color 0.3s ease;
+}
+
+.clickable-name:hover {
+  color: #ffd700;
+}
+
 .alt-info p {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: #ffffff;
   margin: 0.25rem 0;
   transition: color 0.3s ease;
@@ -344,47 +293,7 @@ export default {
   color: #e0e0e0;
 }
 
-/* Paginação */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.2rem;
-  margin-top: 2rem;
-}
-
-.pagination-btn {
-  padding: 0.6rem 1.5rem;
-  background: linear-gradient(135deg, rgba(201, 179, 127, 0.9), rgba(189, 166, 91, 0.9));
-  border: none;
-  border-radius: 10px;
-  color: #ffffff;
-  font-family: 'Cinzel', serif;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.25);
-}
-
-.pagination-btn:hover:not(:disabled) {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
-  background: linear-gradient(135deg, rgba(255, 215, 0, 1), rgba(201, 179, 127, 1));
-}
-
-.pagination-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.page-info {
-  color: #c9b37f;
-  font-size: 1.1rem;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-}
-
-/* Mensagem de "sem resultados" com animação */
+/* Mensagem de "sem resultados" */
 .no-alts {
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
@@ -393,6 +302,7 @@ export default {
   font-size: 1.1rem;
 }
 
+/* Transições para a mensagem de "sem resultados" */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease;
@@ -402,25 +312,4 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
-
-/* Animação para transição de cards */
-.alt-list-enter-active,
-.alt-list-leave-active {
-  transition: all 0.6s ease-in-out;
-}
-
-.alt-list-enter-from,
-.alt-list-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.alt-list-move {
-  transition: all 0.6s ease-in-out;
-}
-
-.alt-list-enter-active {
-  transition-delay: 0.01s;
-}
-
 </style>

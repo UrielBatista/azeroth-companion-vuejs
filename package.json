@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "marked": "^15.0.7",
     "vue": "^3.2.13",
+    "vue-flickity": "^1.2.1",
     "vue-router": "4"
   },
   "devDependencies": {
