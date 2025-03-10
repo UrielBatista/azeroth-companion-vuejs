@@ -12,7 +12,7 @@
   <!-- Grid de alts sem transition-group -->
   <div class="alts-grid">
     <!-- Ao mudar o key, o Flickity será recriado -->
-    <Flickity ref="flickity" :key="flickityKey" class="carousel">
+    <Flickity ref="flickity" :key="flickityKey" class="carousel" :options="flickityOptions">
       <div
         v-for="alt in filteredAlts"
         :key="alt.name + alt.realm"
@@ -67,6 +67,11 @@ export default {
     return {
       searchQuery: '',
       backgroundImage: '',
+      flickityOptions: {
+        pageDots: false,
+        prevNextButtons: true,
+        wrapAround: false,
+      }
     };
   },
   components: {
