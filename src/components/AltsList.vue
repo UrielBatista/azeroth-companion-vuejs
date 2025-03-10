@@ -293,6 +293,18 @@ export default {
   color: #e0e0e0;
 }
 
+
+@media (max-width: 600px) {
+  .alt-info h3,
+  .clickable-name {
+    font-size: 1.5rem; /* Tamanho menor para o h3 em smartphones */
+  }
+
+  .alt-info p {
+    font-size: 0.9rem; /* Tamanho menor para o p em smartphones */
+  }
+}
+
 /* Mensagem de "sem resultados" */
 .no-alts {
   color: rgba(255, 255, 255, 0.6);
