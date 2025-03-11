@@ -57,7 +57,7 @@
 
 <script>
 import axios from 'axios';
-import ErrorModal from '../components/ErrorModal.vue';
+import ErrorModal from '../../components/english/ErrorModal.vue';
 
 export default {
   name: 'SearchCharacter',

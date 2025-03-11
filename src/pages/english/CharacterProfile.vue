@@ -155,10 +155,10 @@
 
 <script>
 import axios from 'axios';
-import ArmorModal from '../components/ModalViewer.vue';
-import CharacterDetails from '../components/CharacterDetails.vue';
-import ClassInfo from '../components/ClassInfo.vue';
-import AltsList from '../components/AltsList.vue';
+import ArmorModal from '../../components/english/ModalViewer.vue';
+import CharacterDetails from '../../components/english/CharacterDetails.vue';
+import ClassInfo from '../../components/english/ClassInfo.vue';
+import AltsList from '../../components/english/AltsList.vue';
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
