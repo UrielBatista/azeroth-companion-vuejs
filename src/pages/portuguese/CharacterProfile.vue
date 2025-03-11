@@ -26,7 +26,7 @@
     </div>
 
     <div class="alts-container">
-      <h3>Alternate Characters</h3>
+      <h3>Personagens Secundários</h3>
         <div v-if="isLoadingAlts" class="loading-spinner"></div>
           <alts-list v-else :alts="alts" class="alts-list-animate" :backgroundImage="backgroundImage"/>
         </div>
@@ -37,7 +37,7 @@
       <div class="stats-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
-          <h3>Statistics</h3>
+          <h3>Estatísticas</h3>
           <ul class="stats-grid">
             <li v-for="stat in statList" :key="stat.key" class="stat-item" :class="`stat-${stat.key}`">
               <img :src="statIcons[stat.key]" :alt="`${stat.label} Icon`" class="stat-icon" />
@@ -57,18 +57,18 @@
               <div class="pvp-overlay"></div>
               <img :src="getBrasaoImage(pvp2s.rating)" class="pvp-icon" />
               <div class="pvp-value">{{ pvp2s.rating }}</div>
-              <div class="pvp-label">Wins: {{ pvp2s.season_match_statistics.won }}</div>
-              <div class="pvp-label">Lost: {{ pvp2s.season_match_statistics.lost }}</div>
-              <div class="pvp-label">Played: {{ pvp2s.season_match_statistics.played }}</div>
+              <div class="pvp-label">Vitórias: {{ pvp2s.season_match_statistics.won }}</div>
+              <div class="pvp-label">Derrotas: {{ pvp2s.season_match_statistics.lost }}</div>
+              <div class="pvp-label">Partidas: {{ pvp2s.season_match_statistics.played }}</div>
               <div class="pvp-rank-label">2x2</div>
             </li>
             <li class="pvp-item">
               <div class="pvp-overlay"></div>
               <img :src="getBrasaoImage(pvp3s.rating)" class="pvp-icon" />
               <div class="pvp-value">{{ pvp3s.rating }}</div>
-              <div class="pvp-label">Wins: {{ pvp3s.season_match_statistics.won }}</div>
-              <div class="pvp-label">Lost: {{ pvp3s.season_match_statistics.lost }}</div>
-              <div class="pvp-label">Played: {{ pvp3s.season_match_statistics.played }}</div>
+              <div class="pvp-label">Vitórias: {{ pvp3s.season_match_statistics.won }}</div>
+              <div class="pvp-label">Derrotas: {{ pvp3s.season_match_statistics.lost }}</div>
+              <div class="pvp-label">Partidas: {{ pvp3s.season_match_statistics.played }}</div>
               <div class="pvp-rank-label">3x3</div>
             </li>
           </ul>
@@ -78,10 +78,10 @@
       <div class="stats-container ai-container">
         <div v-if="!stats" class="loading-spinner"></div>
         <div v-else>
-          <h3>Improvement your gameplay with IA</h3>
+          <h3>Melhore sua jogabilidade com IA</h3>
           <div class="ai-controls">
             <div class="toggle-container">
-              <label class="toggle-label">Game Mode:</label>
+              <label class="toggle-label">Modo de jogo:</label>
               <div class="toggle-switch">
                 <input 
                   type="checkbox" 
@@ -101,7 +101,7 @@
                 id="strategicRotation" 
                 v-model="searchStrategicRotation"
               >
-              <label for="strategicRotation">Search Strategic Rotation</label>
+              <label for="strategicRotation">Busque Rotação Estratégica</label>
             </div>
 
             <div class="btn-container">
@@ -110,17 +110,17 @@
                 class="btn-search-ai" 
                 :disabled="isSearchDisabled || isLoadingAi"
               >
-                Search
+                Buscar
               </button>
               <div v-if="isSearchDisabled" class="cooldown-timer">
-                Next search in: {{ formattedRemainingTime }}
+                Próxima busca em: {{ formattedRemainingTime }}
               </div>
             </div>
           </div>
           <div class="ai-response-container">
             <div class="ai-response" v-if="isLoadingAi || aiResponse">
               <div class="ai-header">
-                <span class="ai-title">AI Analysis</span>
+                <span class="ai-title">Análise IA</span>
               </div>
               <div class="ai-content">
                 <div v-if="isLoadingAi" class="loading-gif">
@@ -130,10 +130,10 @@
               </div>
             </div>
             <div class="ai-placeholder" v-else>
-              Select options above to get AI recommendations
+              Selecione as recomendações para ter a resposta da IA
             </div>
           </div>
-          <button @click="goBack" class="btn-back">Exit</button>
+          <button @click="goBack" class="btn-back">Sair</button>
         </div>
       </div>
     </div>
@@ -155,10 +155,10 @@
 
 <script>
 import axios from 'axios';
-import ArmorModal from '../../components/english/ModalViewer.vue';
-import CharacterDetails from '../../components/english/CharacterDetails.vue';
-import ClassInfo from '../../components/english/ClassInfo.vue';
-import AltsList from '../../components/english/AltsList.vue';
+import ArmorModal from '../../components/portuguese/ModalViewer.vue';
+import CharacterDetails from '../../components/portuguese/CharacterDetails.vue';
+import ClassInfo from '../../components/portuguese/ClassInfo.vue';
+import AltsList from '../../components/portuguese/AltsList.vue';
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
@@ -183,7 +183,7 @@ import arena21012250 from '@/assets/arena-2101-2250.png';
 import arena22515000 from '@/assets/arena-2251-5000.png';
 
 export default {
-  name: 'CharacterProfile',
+  name: 'CharacterProfilePT',
   components: {
     ArmorModal,
     CharacterDetails,
@@ -203,19 +203,19 @@ export default {
         lastLogin: null
       },
       classStats: {
-        'Warrior': ['health', 'rage', 'strength', 'stamina'],
-        'Paladin': ['health', 'mana', 'strength', 'stamina'],
-        'Hunter': ['health', 'focus', 'agility', 'stamina'],
-        'Rogue': ['health', 'energy', 'agility', 'stamina'],
-        'Prist': ['health', 'mana', 'intellect', 'stamina'],
-        'Shaman': ['health', 'mana', 'intellect', 'stamina'],
-        'Mage': ['health', 'mana', 'intellect', 'stamina'],
-        'Warlock': ['health', 'mana', 'intellect', 'stamina'],
-        'Monk': ['health', 'energy', 'agility', 'stamina'],
-        'Druid': ['health', 'mana', 'intellect', 'stamina'],
-        'Demon Hunter': ['health', 'fury', 'agility', 'stamina'],
-        'Death Knight': ['health', 'runic', 'strength', 'stamina'],
-        'Evoker': ['health', 'mana', 'intellect', 'stamina'],
+        'Guerreiro': ['health', 'rage', 'strength', 'stamina'],
+        'Paladino': ['health', 'mana', 'strength', 'stamina'],
+        'Caçador': ['health', 'focus', 'agility', 'stamina'],
+        'Ladino': ['health', 'energy', 'agility', 'stamina'],
+        'Sacerdote': ['health', 'mana', 'intellect', 'stamina'],
+        'Xamã': ['health', 'mana', 'intellect', 'stamina'],
+        'Mago': ['health', 'mana', 'intellect', 'stamina'],
+        'Bruxo': ['health', 'mana', 'intellect', 'stamina'],
+        'Monge': ['health', 'energy', 'agility', 'stamina'],
+        'Druida': ['health', 'mana', 'intellect', 'stamina'],
+        'Caçador de Demônios': ['health', 'fury', 'agility', 'stamina'],
+        'Cavaleiro da Morte': ['health', 'runic', 'strength', 'stamina'],
+        'Conjurante': ['health', 'mana', 'intellect', 'stamina'], // Conjurante
       },
       formattedResponse: "",
       name: this.$route.query.name || 'Unknown',
@@ -256,19 +256,19 @@ export default {
         strength: require('@/assets/icons/strength.svg'),
       },
       classBackgrounds: {
-        'Death Knight': deathknightBackground,
-        'Demon Hunter': demonhunterBackground,
-        'Evoker': dragonBackground,
-        'Druid': druidBackground,
-        'Hunter': hunterBackground,
-        'Mage': mageBackground,
-        'Monk': monkBackground,
-        'Paladin': paladinBackground,
-        'Priest': priestBackground,
-        'Rogue': rogueBackground,
-        'Warlock': warlockBackground,
-        'Warrior': warriorBackground,
-        'Shaman': shamanBackground,
+        'Cavaleiro da Morte': deathknightBackground,
+        'Caçador de Demônios': demonhunterBackground,
+        'Conjurante': dragonBackground,
+        'Druida': druidBackground,
+        'Caçador': hunterBackground,
+        'Mago': mageBackground,
+        'Monge': monkBackground,
+        'Paladino': paladinBackground,
+        'Sacerdote': priestBackground,
+        'Ladino': rogueBackground,
+        'Bruxo': warlockBackground,
+        'Guerreiro': warriorBackground,
+        'Xamã': shamanBackground,
       },
       
       brasaoImages: [
@@ -286,55 +286,57 @@ export default {
     statList() {
       if (!this.stats) return [];
 
-      const classType = this.characterInfo.classtype || 'Warrior';
+      // Obter os atributos primários com base na classe
+      const classType = this.characterInfo.classtype || 'Warrior'; // Default para Guerreiro
       const primaryStats = this.classStats[classType] || this.classStats['Warrior'];
 
+      // Mapear os atributos primários
       const primaryStatsList = primaryStats.map(stat => {
         let label, value;
         switch (stat) {
           case 'health':
-            label = 'HEALTH';
+            label = 'VIDA';
             value = this.stats.health.toLocaleString('pt-BR');
             break;
           case 'rage':
-            label = 'RAGE';
-            value = this.stats.power.toLocaleString('pt-BR');
+            label = 'RAIVA';
+            value = this.stats.power.toLocaleString('pt-BR'); // Assumindo que "power" representa RAIVA
             break;
           case 'strength':
-            label = 'STRENGTH';
+            label = 'FORÇA';
             value = this.stats.strength?.effective.toLocaleString('pt-BR');
             break;
           case 'stamina':
-            label = 'STAMINA';
+            label = 'VIGOR';
             value = this.stats.stamina?.effective.toLocaleString('pt-BR');
             break;
           case 'mana':
             label = 'MANA';
-            value = this.stats.power.toLocaleString('pt-BR');
+            value = this.stats.power.toLocaleString('pt-BR'); // Assumindo que "power" representa MANA
             break;
           case 'focus':
-            label = 'FOCUS';
-            value = this.stats.power.toLocaleString('pt-BR');
+            label = 'CONCENTRAÇÃO';
+            value = this.stats.power.toLocaleString('pt-BR'); // Assumindo que "power" representa CONCENTRAÇÃO
             break;
           case 'agility':
-            label = 'AGILITY';
+            label = 'AGILIDADE';
             value = this.stats.agility?.effective.toLocaleString('pt-BR');
             break;
           case 'energy':
-            label = 'ENERGY';
-            value = this.stats.power.toLocaleString('pt-BR');
+            label = 'ENERGIA';
+            value = this.stats.power.toLocaleString('pt-BR'); // Assumindo que "power" representa ENERGIA
             break;
           case 'intellect':
-            label = 'INTELLECT';
+            label = 'INTELECTO';
             value = this.stats.intellect?.effective.toLocaleString('pt-BR');
             break;
           case 'fury':
-            label = 'FURY';
-            value = this.stats.power.toLocaleString('pt-BR');
+            label = 'FÚRIA';
+            value = this.stats.power.toLocaleString('pt-BR'); // Assumindo que "power" representa FÚRIA
             break;
           case 'runic':
-            label = 'RUNIC POWER';
-            value = this.stats.power.toLocaleString('pt-BR');
+            label = 'PODER RÚNICO';
+            value = this.stats.power.toLocaleString('pt-BR'); // Assumindo que "power" representa PODER RÚNICO
             break;
           default:
             label = stat.toUpperCase();
@@ -343,13 +345,15 @@ export default {
         return { key: stat, label, value };
       });
 
+      // Atributos secundários fixos
       const secondaryStatsList = [
-        { key: 'critical', label: 'CRITICAL STRIKE', value: this.stats.melee_crit?.value.toFixed(2) + ' %' },
-        { key: 'haste', label: 'HASTE', value: this.stats.melee_haste?.value.toFixed(2) + ' %' },
-        { key: 'mastery', label: 'MASTERY', value: this.stats.mastery?.value.toFixed(1) + ' %' },
-        { key: 'versatility', label: 'VERSATILITY', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
+        { key: 'critical', label: 'ACERTO CRÍTICO', value: this.stats.melee_crit?.value.toFixed(2) + ' %' },
+        { key: 'haste', label: 'ACELERAÇÃO', value: this.stats.melee_haste?.value.toFixed(2) + ' %' },
+        { key: 'mastery', label: 'MAESTRIA', value: this.stats.mastery?.value.toFixed(1) + ' %' },
+        { key: 'versatility', label: 'VERSATILIDADE', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
       ].filter(stat => stat.value !== undefined);
 
+      // Combinar atributos primários e secundários
       return [...primaryStatsList, ...secondaryStatsList].filter(stat => stat.value !== undefined);
     },
     isContentLoaded() {
@@ -388,17 +392,20 @@ export default {
   },
   watch: {
     '$route.query'(newQuery, oldQuery) {
+      // Verifica se houve mudança significativa nos parâmetros relevantes
       if (newQuery.name !== oldQuery.name || newQuery.realm !== oldQuery.realm || newQuery.realmPath !== oldQuery.realmPath || newQuery.image !== oldQuery.image) {
         this.name = newQuery.name || 'Unknown';
         this.realm = newQuery.realm || 'Unknown';
         this.realmPath = newQuery.realmPath || 'Unknown';
         this.imageArmor = newQuery.image || '';
 
+        // Recarrega os dados do personagem
         this.fetchCharacterData();
         this.fetchEquipaments();
         this.fetchStats();
         this.fetchPvPBracket();
 
+        // Verifica as imagens novamente
         this.checkImageLoaded();
         this.loadBackgroundImage();
       }
@@ -422,19 +429,19 @@ export default {
     },
     getClassId(className) {
       const classMap = {
-        'Warrior': 1,
-        'Paladin': 2,
-        'Hunter': 3,
-        'Rogue': 4,
-        'Priest': 5,
-        'Death Knight': 6,
-        'Shaman': 7,
-        'Mage': 8,
-        'Warlock': 9,
-        'Monk': 10,
-        'Druid': 11,
-        'Demon Hunter': 12,
-        'Evoker': 13,
+        'Guerreiro': 1,
+        'Paladino': 2,
+        'Caçador': 3,
+        'Ladino': 4,
+        'Sacerdote': 5,
+        'Cavaleiro da Morte': 6,
+        'Xamã': 7,
+        'Mago': 8,
+        'Bruxo': 9,
+        'Monge': 10,
+        'Druida': 11,
+        'Caçador de Demônios': 12,
+        'Conjurante': 13,
       };
       return classMap[className] || 'Unknown';
     },
@@ -468,7 +475,7 @@ export default {
       }
     },
     goBack() {
-      this.$router.push({ name: 'SearchCharacter' });
+      this.$router.push({ name: 'SearchCharacterPT' });
     },
     formatResponse() {
       let formatted = this.aiResponse
@@ -490,7 +497,7 @@ export default {
 
       this.isLoadingAi = true;
       const mode = this.isPvE ? 'PvE' : 'PvP';
-      const rotation = this.searchStrategicRotation ? 'and what is the best rotation strategy' : '';
+      const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
 
       const tokenAi = process.env.VUE_APP_AI_TOKEN;
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
@@ -498,8 +505,8 @@ export default {
       const requestBody = {
         contents: [{
           parts: [{
-            text: `Please help me based on the equipment data of the ${this.characterInfo.classtype} 
-              class character from World of Wacraft, ${rotation} ${mode}. \n Equipment that should be analyzed in bellow \n 
+            text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
+              do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
               ${JSON.stringify(this.equipaments)}`
           }]
         }]
@@ -545,7 +552,7 @@ export default {
         const token = localStorage.getItem('access_token');
         const realmParam = this.realmPath.toLowerCase();
         const nameParam = this.name.toLowerCase();
-        const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}?namespace=profile-us&locale=en_US`;
+        const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}?namespace=profile-us&locale=pt_BR`;
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -566,7 +573,7 @@ export default {
     async fetchEquipaments() {
         const token = localStorage.getItem('access_token');
         const apiFetch = url => fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realmPath.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=en_US`;
+        const equipmentUrl = `https://us.api.blizzard.com/profile/wow/character/${this.realmPath.toLowerCase()}/${this.name.toLowerCase()}/equipment?namespace=profile-us&locale=pt_BR`;
         const responseEquipments = await apiFetch(equipmentUrl);
         
         if (!responseEquipments.ok) throw new Error('Failed to fetch equipment');
@@ -580,7 +587,7 @@ export default {
         const token = localStorage.getItem('access_token');
         const realmParam = this.realmPath.toLowerCase();
         const nameParam = this.name.toLowerCase();
-        const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/statistics?namespace=profile-us&locale=en_US`;
+        const url = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/statistics?namespace=profile-us&locale=pt_BR`;
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -593,8 +600,8 @@ export default {
       const token = localStorage.getItem('access_token');
       const realmParam = this.realmPath.toLowerCase();
       const nameParam = this.name.toLowerCase();
-      const pvp2s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/2v2?namespace=profile-us&locale=en_US`;
-      const pvp3s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/3v3?namespace=profile-us&locale=en_US`;
+      const pvp2s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/2v2?namespace=profile-us&locale=pt_BR`;
+      const pvp3s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/3v3?namespace=profile-us&locale=pt_BR`;
 
       try {
         const [response2s, response3s] = await Promise.all([

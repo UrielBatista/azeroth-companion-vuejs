@@ -281,8 +281,8 @@ export default {
           this.openModal();
           this.isLoading = false;
         } else {
-        console.error("Erro ao buscar personagem:", error);
-        alert("Erro ao buscar personagem");
+        console.error("Error when searching for character:", error);
+        alert("Error when searching for character");
         this.submitted = false;
         this.isLoading = false;
         }

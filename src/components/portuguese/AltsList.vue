@@ -4,7 +4,7 @@
     <input
       v-model="searchQuery"
       type="text"
-      placeholder="Search by alt name..."
+      placeholder="Filtre um personagem..."
       class="search-input"
     />
   </div>
@@ -22,7 +22,7 @@
         <div class="alt-info">
           <h3  @click="handleClick(alt.name, alt.realm)" class="clickable-name">
             {{ alt.name }} - {{ alt.realm }}</h3>
-          <p>Class: {{ getClassName(alt.class) }}</p>
+          <p>Classe: {{ getClassName(alt.class) }}</p>
         </div>
       </div>
     </Flickity>
@@ -31,7 +31,7 @@
   <!-- Mensagem caso não haja resultados -->
   <transition name="fade">
     <p v-if="filteredAlts.length === 0" class="no-alts">
-      No alts found matching your search.
+      Nenhum personagem secundário encontrado.
     </p>
   </transition>
 </template>
@@ -55,7 +55,7 @@ import warriorBackground from '@/assets/warrior-background.webp';
 import shamanBackground from '@/assets/xama-background.webp';
 
 export default {
-  name: 'AltsList',
+  name: 'AltsListPT',
   inheritAttrs: false,
   props: {
     alts: {
@@ -105,7 +105,7 @@ export default {
         const characterImage = response.data.assets.find(asset => asset.key === "main-raw").value;
 
         this.$router.push({
-          name: 'CharacterProfile',
+          name: 'CharacterProfilePT',
           query: {
             name: characterName,
             realm: characterRealm,
@@ -116,28 +116,28 @@ export default {
 
       } catch (error) {
         if (error.status === 404) {
-          alert("Character does not exist or is disabled for searches");
+          alert("Personagem não existe ou desabilitado para buscas");
         } else {
           console.error("Erro ao buscar personagem:", error);
-          alert("Error when searching for character");
+          alert("Erro ao buscar personagem");
         }
       }
     },
     getClassName(classId) {
       const classMap = {
-        1: 'Warrior',
-        2: 'Paladin',
-        3: 'Hunter',
-        4: 'Rogue',
-        5: 'Priest',
-        6: 'Death Knight',
-        7: 'Shaman',
-        8: 'Mage',
-        9: 'Warlock',
-        10: 'Monk',
-        11: 'Druid',
-        12: 'Demon Hunter',
-        13: 'Evoker',
+        1: 'Guerreiro',
+        2: 'Paladino',
+        3: 'Caçador',
+        4: 'Ladino',
+        5: 'Sacerdote',
+        6: 'Cavaleiro da Morte',
+        7: 'Xamã',
+        8: 'Mago',
+        9: 'Bruxo',
+        10: 'Monge',
+        11: 'Druida',
+        12: 'Caçador de Demônios',
+        13: 'Conjurante',
       };
       return classMap[classId] || 'Unknown';
     },

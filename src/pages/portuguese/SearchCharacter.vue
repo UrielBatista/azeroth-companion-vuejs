@@ -243,7 +243,7 @@ export default {
     },
     async handleLogin() {
       if (!this.username.trim() || !this.reign.trim()) {
-        alert("Please fill in both Character Name and Reign fields.");
+        alert("Por favor, preencha os campos Nome do Personagem e Reinado.");
         return;
       }
 
@@ -263,7 +263,7 @@ export default {
         const characterImage = response.data.assets.find(asset => asset.key === "main-raw").value;
 
         this.$router.push({
-          name: 'CharacterProfile',
+          name: 'CharacterProfilePT',
           query: {
             name: characterName,
             realm: characterRealm,
