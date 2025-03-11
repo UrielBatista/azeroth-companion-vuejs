@@ -2,7 +2,7 @@
   <transition name="fade">
     <div class="modal-backdrop" @click.self="$emit('close')">
       <div class="modal" :style="{ '--background-image': `url(${backgroundImage})` }">
-        <h2 class="modal-title">Armor level: {{ averageIlvl }}</h2>
+        <h2 class="modal-title">Nível da Armadura: {{ averageIlvl }}</h2>
         <div v-if="showSpinner" class="loading-container">
           <div class="spinner"></div>
         </div>
