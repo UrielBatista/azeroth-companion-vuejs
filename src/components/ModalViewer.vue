@@ -564,4 +564,61 @@ export default {
 .tooltip-content li span.green {
   color: #00ff00;
 }
+
+@media (max-width: 768px) {
+  .modal {
+    width: 90%;
+    padding: 10px;
+    max-height: 90vh;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .thumbnail {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+  }
+
+  .bottom-icons .thumbnail {
+    width: 25px;
+    height: 25px;
+    margin: 0 5px;
+  }
+
+  .central-display {
+    z-index: -1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .central-display img {
+    max-height: 60%; /* Aumentado de 300px para 400px */
+  }
+
+  .bottom-icons {
+    margin-top: 10px;
+  }
+
+  .tooltip {
+    width: 200px;
+    font-size: 0.8rem;
+  }
+
+  .tooltip-content h3 {
+    font-size: 1rem;
+  }
+
+  .tooltip-content p,
+  .tooltip-content ul {
+    font-size: 0.8rem;
+  }
+
+}
 </style>

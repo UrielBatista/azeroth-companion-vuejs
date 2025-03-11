@@ -774,6 +774,11 @@ h1 {
 }
 
 @media (max-width: 768px) {
+  .image-container {
+    width: 90%;
+    margin: 1rem auto;
+    padding: 0.8rem;
+  }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }

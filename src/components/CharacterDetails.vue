@@ -92,7 +92,15 @@
   
   @media (max-width: 768px) {
     .character-details {
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      width: 90%;
+      margin: 1rem auto;
+      padding: 0.8rem;
+      grid-template-columns: 1fr;
+      justify-content: center;
+    }
+    
+    .detail-item {
+      padding: 0.5rem 0;
     }
   }
-  </style>
+</style>

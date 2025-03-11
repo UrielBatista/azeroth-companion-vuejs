@@ -69,7 +69,7 @@ export default {
       backgroundImage: '',
       flickityOptions: {
         pageDots: false,
-        prevNextButtons: true,
+        prevNextButtons: false,
         wrapAround: false,
       }
     };
