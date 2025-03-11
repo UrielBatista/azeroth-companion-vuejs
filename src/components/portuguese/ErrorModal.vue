@@ -42,7 +42,7 @@
   
   <script>
 export default {
-  name: 'ErrorModal',
+  name: 'ErrorModalPT',
   props: {
     isVisible: {
       type: Boolean,

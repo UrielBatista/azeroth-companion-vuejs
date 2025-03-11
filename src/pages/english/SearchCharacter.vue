@@ -57,7 +57,7 @@
 
 <script>
 import axios from 'axios';
-import ErrorModal from '../components/ErrorModal.vue';
+import ErrorModal from '../../components/english/ErrorModal.vue';
 
 export default {
   name: 'SearchCharacter',
@@ -281,8 +281,8 @@ export default {
           this.openModal();
           this.isLoading = false;
         } else {
-        console.error("Erro ao buscar personagem:", error);
-        alert("Erro ao buscar personagem");
+        console.error("Error when searching for character:", error);
+        alert("Error when searching for character");
         this.submitted = false;
         this.isLoading = false;
         }

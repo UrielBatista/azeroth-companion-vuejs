@@ -155,10 +155,10 @@
 
 <script>
 import axios from 'axios';
-import ArmorModal from '../components/ModalViewer.vue';
-import CharacterDetails from '../components/CharacterDetails.vue';
-import ClassInfo from '../components/ClassInfo.vue';
-import AltsList from '../components/AltsList.vue';
+import ArmorModal from '../../components/english/ModalViewer.vue';
+import CharacterDetails from '../../components/english/CharacterDetails.vue';
+import ClassInfo from '../../components/english/ClassInfo.vue';
+import AltsList from '../../components/english/AltsList.vue';
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
@@ -202,6 +202,21 @@ export default {
         guild: '',
         lastLogin: null
       },
+      classStats: {
+        'Warrior': ['health', 'rage', 'strength', 'stamina'],
+        'Paladin': ['health', 'mana', 'strength', 'stamina'],
+        'Hunter': ['health', 'focus', 'agility', 'stamina'],
+        'Rogue': ['health', 'energy', 'agility', 'stamina'],
+        'Prist': ['health', 'mana', 'intellect', 'stamina'],
+        'Shaman': ['health', 'mana', 'intellect', 'stamina'],
+        'Mage': ['health', 'mana', 'intellect', 'stamina'],
+        'Warlock': ['health', 'mana', 'intellect', 'stamina'],
+        'Monk': ['health', 'energy', 'agility', 'stamina'],
+        'Druid': ['health', 'mana', 'intellect', 'stamina'],
+        'Demon Hunter': ['health', 'fury', 'agility', 'stamina'],
+        'Death Knight': ['health', 'runic', 'strength', 'stamina'],
+        'Evoker': ['health', 'mana', 'intellect', 'stamina'],
+      },
       formattedResponse: "",
       name: this.$route.query.name || 'Unknown',
       realm: this.$route.query.realm || 'Unknown',
@@ -226,13 +241,19 @@ export default {
       isLoadingAlts: true,
       statIcons: {
         health: require('@/assets/icons/health.svg'),
-        power: require('@/assets/icons/energy.svg'),
+        energy: require('@/assets/icons/energy.svg'),
         stamina: require('@/assets/icons/stamina.svg'),
         agility: require('@/assets/icons/agility.svg'),
         critical: require('@/assets/icons/critical.svg'),
         haste: require('@/assets/icons/haste.svg'),
         mastery: require('@/assets/icons/mastery.svg'),
         versatility: require('@/assets/icons/versatility.svg'),
+        mana: require('@/assets/icons/mana.svg'),
+        fury: require('@/assets/icons/fury.svg'),
+        intellect: require('@/assets/icons/intellect.svg'),
+        rage: require('@/assets/icons/rage.svg'),
+        runic: require('@/assets/icons/runic.svg'),
+        strength: require('@/assets/icons/strength.svg'),
       },
       classBackgrounds: {
         'Death Knight': deathknightBackground,
@@ -264,16 +285,72 @@ export default {
   computed: {
     statList() {
       if (!this.stats) return [];
-      return [
-        { key: 'health', label: 'HEALTH', value: this.stats.health.toLocaleString('pt-BR') },
-        { key: 'power', label: 'ENERGY', value: this.stats.power.toLocaleString('pt-BR') },
-        { key: 'stamina', label: 'STAMINA', value: this.stats.stamina?.effective.toLocaleString('pt-BR') },
-        { key: 'agility', label: 'AGILITY', value: this.stats.agility?.effective.toLocaleString('pt-BR') },
+
+      const classType = this.characterInfo.classtype || 'Warrior';
+      const primaryStats = this.classStats[classType] || this.classStats['Warrior'];
+
+      const primaryStatsList = primaryStats.map(stat => {
+        let label, value;
+        switch (stat) {
+          case 'health':
+            label = 'HEALTH';
+            value = this.stats.health.toLocaleString('pt-BR');
+            break;
+          case 'rage':
+            label = 'RAGE';
+            value = this.stats.power.toLocaleString('pt-BR');
+            break;
+          case 'strength':
+            label = 'STRENGTH';
+            value = this.stats.strength?.effective.toLocaleString('pt-BR');
+            break;
+          case 'stamina':
+            label = 'STAMINA';
+            value = this.stats.stamina?.effective.toLocaleString('pt-BR');
+            break;
+          case 'mana':
+            label = 'MANA';
+            value = this.stats.power.toLocaleString('pt-BR');
+            break;
+          case 'focus':
+            label = 'FOCUS';
+            value = this.stats.power.toLocaleString('pt-BR');
+            break;
+          case 'agility':
+            label = 'AGILITY';
+            value = this.stats.agility?.effective.toLocaleString('pt-BR');
+            break;
+          case 'energy':
+            label = 'ENERGY';
+            value = this.stats.power.toLocaleString('pt-BR');
+            break;
+          case 'intellect':
+            label = 'INTELLECT';
+            value = this.stats.intellect?.effective.toLocaleString('pt-BR');
+            break;
+          case 'fury':
+            label = 'FURY';
+            value = this.stats.power.toLocaleString('pt-BR');
+            break;
+          case 'runic':
+            label = 'RUNIC POWER';
+            value = this.stats.power.toLocaleString('pt-BR');
+            break;
+          default:
+            label = stat.toUpperCase();
+            value = 'N/A';
+        }
+        return { key: stat, label, value };
+      });
+
+      const secondaryStatsList = [
         { key: 'critical', label: 'CRITICAL STRIKE', value: this.stats.melee_crit?.value.toFixed(2) + ' %' },
         { key: 'haste', label: 'HASTE', value: this.stats.melee_haste?.value.toFixed(2) + ' %' },
         { key: 'mastery', label: 'MASTERY', value: this.stats.mastery?.value.toFixed(1) + ' %' },
         { key: 'versatility', label: 'VERSATILITY', value: this.stats.versatility_damage_done_bonus?.toFixed(1) + ' %' },
       ].filter(stat => stat.value !== undefined);
+
+      return [...primaryStatsList, ...secondaryStatsList].filter(stat => stat.value !== undefined);
     },
     isContentLoaded() {
       return this.imageLoaded && this.backgroundLoaded;
@@ -311,20 +388,17 @@ export default {
   },
   watch: {
     '$route.query'(newQuery, oldQuery) {
-      // Verifica se houve mudança significativa nos parâmetros relevantes
       if (newQuery.name !== oldQuery.name || newQuery.realm !== oldQuery.realm || newQuery.realmPath !== oldQuery.realmPath || newQuery.image !== oldQuery.image) {
         this.name = newQuery.name || 'Unknown';
         this.realm = newQuery.realm || 'Unknown';
         this.realmPath = newQuery.realmPath || 'Unknown';
         this.imageArmor = newQuery.image || '';
 
-        // Recarrega os dados do personagem
         this.fetchCharacterData();
         this.fetchEquipaments();
         this.fetchStats();
         this.fetchPvPBracket();
 
-        // Verifica as imagens novamente
         this.checkImageLoaded();
         this.loadBackgroundImage();
       }
@@ -416,7 +490,7 @@ export default {
 
       this.isLoadingAi = true;
       const mode = this.isPvE ? 'PvE' : 'PvP';
-      const rotation = this.searchStrategicRotation ? 'e qual a melhor estratégia de rotação' : '';
+      const rotation = this.searchStrategicRotation ? 'and what is the best rotation strategy' : '';
 
       const tokenAi = process.env.VUE_APP_AI_TOKEN;
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${tokenAi}`;
@@ -424,8 +498,8 @@ export default {
       const requestBody = {
         contents: [{
           parts: [{
-            text: `Ajude-me com base nos dados de equipamento do personagem da classe ${this.characterInfo.classtype} 
-              do World of Warcraft, ${rotation} ${mode}. \n Equipamentos que devem ser analisados do ${this.realmPath} \n 
+            text: `Please help me based on the equipment data of the ${this.characterInfo.classtype} 
+              class character from World of Wacraft, ${rotation} ${mode}. \n Equipment that should be analyzed in bellow \n 
               ${JSON.stringify(this.equipaments)}`
           }]
         }]
@@ -1253,13 +1327,19 @@ input:checked + .toggle-slider:before {
 }
 
 .stat-health { color: #27cc4e; border-color: #27cc4e; }
-.stat-power { color: #cb9501; border-color: #cb9501; }
+.stat-energy { color: #cb9501; border-color: #cb9501; }
 .stat-stamina { color: #ff8b2d; border-color: #ff8b2d; }
 .stat-agility { color: #ffd955; border-color: #ffd955; }
 .stat-critical { color: #e01c1c; border-color: #e01c1c; }
 .stat-haste { color: #0ed59b; border-color: #0ed59b; }
 .stat-mastery { color: #9256ff; border-color: #9256ff; }
 .stat-versatility { color: #bfbfbf; border-color: #bfbfbf; }
+.stat-fury { color: #8400ff; border-color: #8400ff; }
+.stat-intellect { color: #d26cd1; border-color: #d26cd1; }
+.stat-mana { color: #1c8aff; border-color: #1c8aff; }
+.stat-rage { color: #ab0000; border-color: #ab0000; }
+.stat-runic { color: #00bcde; border-color: #00bcde; }
+.stat-strength { color: #f33232; border-color: #f33232; }
 
 @media (max-width: 768px) {
   .image-container {
