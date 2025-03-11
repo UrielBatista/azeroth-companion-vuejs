@@ -558,16 +558,6 @@ export default {
     },
     openArmorModal() {
       this.showArmorModal = true;
-      let elevate = 0.79;
-      if (!this.aiResponse){
-        elevate = 0.75;
-      }
-      this.$nextTick(() => {
-        window.scrollTo({
-          top: window.innerHeight / elevate,
-          behavior: 'smooth'
-        });
-      });
     },
     getBrasaoImage(rating) {
       for (const brasao of this.brasaoImages) {

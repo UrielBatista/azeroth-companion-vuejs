@@ -248,7 +248,7 @@ export default {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 40%;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
@@ -599,7 +599,7 @@ export default {
   }
 
   .central-display img {
-    max-height: 60%; /* Aumentado de 300px para 400px */
+    max-height: 100%;
   }
 
   .bottom-icons {
