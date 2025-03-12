@@ -210,6 +210,14 @@ export default {
 
         const items = await Promise.all(itemPromises);
         const validItems = items.filter(Boolean);
+        
+        const slotOrder = Object.values(slotMapping);
+
+        validItems.sort((a, b) => {
+          const indexA = slotOrder.indexOf(a.name);
+          const indexB = slotOrder.indexOf(b.name);
+          return indexA - indexB;
+        });
 
         this.armorPieces = validItems.filter(i => ['Head', 'Neck', 'Shoulder', 'Back', 'Chest', 'Shirt', 'Tabard', 'Wrist'].includes(i.name));
         this.rightItems = validItems.filter(i => ['Hands', 'Waist', 'Legs', 'Feet', 'Finger_1', 'Finger_2', 'Trinket_1', 'Trinket_2'].includes(i.name));
