@@ -72,6 +72,7 @@
               <div class="pvp-rank-label">3x3</div>
             </li>
           </ul>
+          <TopPvPPlayers :classType="characterInfo.classtype" />
         </div>
       </div>
 
@@ -159,6 +160,7 @@ import ArmorModal from '../../components/portuguese/ModalViewer.vue';
 import CharacterDetails from '../../components/portuguese/CharacterDetails.vue';
 import ClassInfo from '../../components/portuguese/ClassInfo.vue';
 import AltsList from '../../components/portuguese/AltsList.vue';
+import TopPvPPlayers from '../../components/portuguese/TopPvPPlayers.vue';
 
 import deathknightBackground from '@/assets/deathknight-background.webp';
 import demonhunterBackground from '@/assets/demonhunter-background.webp';
@@ -189,6 +191,7 @@ export default {
     CharacterDetails,
     ClassInfo,
     AltsList,
+    TopPvPPlayers,
   },
   data() {
     return {
@@ -242,6 +245,7 @@ export default {
       statIcons: {
         health: require('@/assets/icons/health.svg'),
         energy: require('@/assets/icons/energy.svg'),
+        focus: require('@/assets/icons/focus.svg'),
         stamina: require('@/assets/icons/stamina.svg'),
         agility: require('@/assets/icons/agility.svg'),
         critical: require('@/assets/icons/critical.svg'),
@@ -1335,6 +1339,7 @@ input:checked + .toggle-slider:before {
 
 .stat-health { color: #27cc4e; border-color: #27cc4e; }
 .stat-energy { color: #cb9501; border-color: #cb9501; }
+.stat-focus { color: #d45719; border-color: #d45719; }
 .stat-stamina { color: #ff8b2d; border-color: #ff8b2d; }
 .stat-agility { color: #ffd955; border-color: #ffd955; }
 .stat-critical { color: #e01c1c; border-color: #e01c1c; }
