@@ -2,9 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import SearchCharacterPT from '@/pages/portuguese/SearchCharacter.vue'
 import SearchCharacter from '@/pages/english/SearchCharacter.vue'
 import ProfilePT from '@/pages/portuguese/CharacterProfile.vue'
-import Profile from '../pages/english/CharacterProfile.vue'
+import Profile from '@/pages/english/CharacterProfile.vue'
+import WelcomePage from '@/pages/WelcomePage.vue'
 
 const routes = [
+  {
+    path: '/',
+    name: 'WelcomePage',
+    component: WelcomePage
+  },
   {
     path: '/en-us',
     name: 'SearchCharacter',
