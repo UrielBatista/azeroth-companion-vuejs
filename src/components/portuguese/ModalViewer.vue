@@ -574,6 +574,9 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .modal-backdrop {
+    height: 33%;
+  }
   .modal {
     width: 90%;
     padding: 10px;

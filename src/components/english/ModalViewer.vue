@@ -256,7 +256,7 @@ export default {
   top: 0;
   left: 0;
   width: 100%;
-  height: 38%;
+  height: 40%;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
@@ -574,6 +574,9 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .modal-backdrop {
+    height: 33%;
+  }
   .modal {
     width: 90%;
     padding: 10px;
