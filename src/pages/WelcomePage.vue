@@ -179,11 +179,12 @@ html, body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 60px; /* Altura fixa que define quantos pixels do topo serão exibidos */
-  background: url('../assets/parchment-top.png') no-repeat center top -15px, #F5E8C7; /* Foca no topo da imagem */
-  background-size: cover; /* Ajusta a imagem para cobrir o elemento */
-  border-bottom: 2px solid gold; /* Borda dourada */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  height: 60px; 
+  background: url('../assets/parchment-top.png') no-repeat center top -9px, #F5E8C7;
+  background-size: cover; 
+  border-bottom: 2px solid gold;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5),
+              inset 0 10px 10px rgba(0, 0, 0, 0.3);
   z-index: 2;
   transform-origin: top center;
 }
@@ -198,12 +199,13 @@ html, body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 60px; /* Altura fixa inicial para cobrir metade do pergaminho fechado */
-  background: url('../assets/parchment-top.png') no-repeat center top, #F5E8C7; /* Remove repetição */
-  background-size: cover; /* Ajusta a imagem para cobrir o elemento */
-  border-top: 2px solid gold; /* Borda dourada */
-  box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.5), /* Sombra externa para cima (mantida) */
-              inset 0 10px 10px rgba(0, 0, 0, 0.3); /* Sombra interna na parte superior */
+  height: 60px;
+  background: url('../assets/parchment-top.png') no-repeat center top, #F5E8C7;
+  background-size: cover;
+  border-top: 2px solid gold;
+  box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.5),
+              0 10px 20px rgba(0, 0, 0, 0.5),
+              inset 0 10px 10px rgba(0, 0, 0, 0.3);
   z-index: 2;
   transform-origin: bottom center;
 }

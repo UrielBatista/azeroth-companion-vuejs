@@ -49,7 +49,7 @@
       </div>
 
       <div class="stats-container">
-        <div v-if="!pvp2s" class="loading-spinner"></div>
+        <div v-if="!pvp3s" class="loading-spinner"></div>
         <div v-else>
           <h3>PvP</h3>
           <ul class="pvp-grid">
@@ -426,7 +426,6 @@ export default {
           this.backgroundLoaded = true;
         };
         img.onerror = () => {
-          console.error('Erro ao carregar a imagem de fundo');
           this.backgroundLoaded = true;
         };
       }
@@ -604,28 +603,42 @@ export default {
       const token = localStorage.getItem('access_token');
       const realmParam = this.realmPath.toLowerCase();
       const nameParam = this.name.toLowerCase();
-      const pvp2s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/2v2?namespace=profile-us&locale=pt_BR`;
-      const pvp3s = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/3v3?namespace=profile-us&locale=pt_BR`;
+      const pvp2sUrl = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/2v2?namespace=profile-us&locale=pt_BR`;
+      const pvp3sUrl = `https://us.api.blizzard.com/profile/wow/character/${realmParam}/${nameParam}/pvp-bracket/3v3?namespace=profile-us&locale=pt_BR`;
+      
+      const defaultStats = {
+        rating: 0,
+        season_match_statistics: { won: 0, lost: 0, played: 0 }
+      };
 
       try {
         const [response2s, response3s] = await Promise.all([
-          axios.get(pvp2s, { headers: { Authorization: `Bearer ${token}` } })
-          .catch(err => {
-            err;
-            console.log('Not Found 2x2');
-            return {data: {rating: 0, season_match_statistics: {lost: 0, won: 0, played: 0}}};
-          }),
-          axios.get(pvp3s, { headers: { Authorization: `Bearer ${token}` } })
-          .catch(err => {
-            err;
-            console.log('Not Found 3x3');
-            return {data: {rating: 0, season_match_statistics: {lost: 0, won: 0, played: 0}}};
-          }),
+          axios.get(pvp2sUrl, { headers: { Authorization: `Bearer ${token}` } })
+            .catch(err => {
+              console.log('Not Found 2x2:', err.message);
+              return { data: defaultStats };
+            }),
+          axios.get(pvp3sUrl, { headers: { Authorization: `Bearer ${token}` } })
+            .catch(err => {
+              console.log('Not Found 3x3:', err.message);
+              return { data: defaultStats };
+            }),
         ]);
-        this.pvp2s = response2s.data;
-        this.pvp3s = response3s.data;
+
+        const currentSeasonId = parseInt(process.env.VUE_APP_SEASSON_ID);
+
+        this.pvp2s = (response2s.data.season?.id < currentSeasonId) 
+          ? defaultStats 
+          : response2s.data;
+
+        this.pvp3s = (response3s.data.season?.id < currentSeasonId) 
+          ? defaultStats 
+          : response3s.data;
+
       } catch (error) {
-        console.error('Erro ao buscar estatísticas PvP:', error);
+        console.error('Erro geral ao buscar estatísticas PvP:', error);
+        this.pvp2s = defaultStats;
+        this.pvp3s = defaultStats;
       }
     },
     updateCharacterData(data) {
