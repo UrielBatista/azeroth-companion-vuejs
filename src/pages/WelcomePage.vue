@@ -213,8 +213,8 @@ h1 {
 .title-line {
   display: block;
   clip-path: inset(0 100% 0 0);
-  animation: write 3s ease-out forwards;
-  animation-delay: calc(1s + 3s * var(--index));
+  animation: write 1.5s ease-out forwards;
+  animation-delay: calc(0.5s + 1.5s * var(--index));
 }
 
 .title-line:nth-child(1) { --index: 0; }
@@ -227,8 +227,8 @@ p {
   text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.6);
   text-align: left;
   clip-path: inset(0 100% 0 0);
-  animation: write 3s ease-out forwards;
-  animation-delay: 7s;
+  animation: write 1.5s ease-out forwards;
+  animation-delay: 3.5s;
 }
 
 .description-line {
@@ -256,8 +256,8 @@ p {
   position: relative;
   padding-left: 1.2rem;
   clip-path: inset(0 100% 0 0);
-  animation: write 3s ease-out forwards;
-  animation-delay: calc(16s + 3s * var(--index));
+  animation: write 1.5s ease-out forwards;
+  animation-delay: calc(5s + 1.5s * var(--index));
 }
 
 .instructions li {
@@ -279,8 +279,8 @@ p {
   justify-content: center;
   gap: 2rem;
   opacity: 0;
-  animation: fadeIn 1s ease-in-out forwards 28s; /* Aparece após 28s */
-  margin-top: auto; /* Garante que os botões fiquem na parte inferior */
+  animation: fadeIn 1s ease-in-out forwards 11s;
+  margin-top: auto;
 }
 
 .btn-language {
