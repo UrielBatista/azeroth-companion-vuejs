@@ -90,15 +90,16 @@
         return arena01299;
       },
       async fetchTopPlayers() {
+        const token = localStorage.getItem('access_token');
         this.loading = true;
         try {
           const baseUrl = 'https://scrapping-python-alts-production.up.railway.app/leaderboard';
           const headers = { Accept: 'application/json' };
   
-          const response2v2 = await axios.get(`${baseUrl}/${this.classType}/2v2`, { headers });
+          const response2v2 = await axios.get(`${baseUrl}/${this.classType}/2v2/${token}`, { headers });
           this.top2v2Players = response2v2.data.slice(0, 3);
   
-          const response3v3 = await axios.get(`${baseUrl}/${this.classType}/3v3`, { headers });
+          const response3v3 = await axios.get(`${baseUrl}/${this.classType}/3v3/${token}`, { headers });
           this.top3v3Players = response3v3.data.slice(0, 3);
         } catch (error) {
           console.error('Erro ao buscar dados dos top PvP players:', error);
