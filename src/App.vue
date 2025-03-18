@@ -8,7 +8,7 @@
       :muted="isMuted"
       @canplay="onAudioCanPlay"
     >
-      <source src="/tavernLogin.mp3" type="audio/mpeg" />
+      <source :src="currentTrack" type="audio/mpeg" />
       Seu navegador não suporta áudio em HTML5.
     </audio>
 
@@ -25,10 +25,21 @@ export default {
   name: 'App',
   data() {
     return {
-      isMuted: true
+      isMuted: true,
+      tracks: [
+        '/tavernLogin.mp3',
+        '/dwarfTavern.mp3',
+      ],
+      currentTrackIndex: 0
     };
   },
+  computed: {
+    currentTrack() {
+      return this.tracks[this.currentTrackIndex];
+    }
+  },
   mounted() {
+    this.selectRandomTrack();
     const audio = this.$refs.bgMusic;
     audio.volume = 0.1;
     audio.play().catch(err => {
@@ -38,9 +49,16 @@ export default {
   methods: {
     toggleMute() {
       this.isMuted = !this.isMuted;
+      const audio = this.$refs.bgMusic;
       if (!this.isMuted) {
-        this.$refs.bgMusic.play().catch(err => console.error(err));
+        this.selectRandomTrack();
+        audio.load(); // Carrega a nova faixa
+        audio.play().catch(err => console.error(err));
       }
+    },
+    selectRandomTrack() {
+      const newIndex = Math.floor(Math.random() * this.tracks.length);
+      this.currentTrackIndex = newIndex;
     },
     onAudioCanPlay() {
     }
