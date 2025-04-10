@@ -3,6 +3,6 @@ module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
   devServer: {
-    allowedHosts: 'all'
+    allowedHosts: 'azeroth-companion.up.railway.app'
   }
 })
